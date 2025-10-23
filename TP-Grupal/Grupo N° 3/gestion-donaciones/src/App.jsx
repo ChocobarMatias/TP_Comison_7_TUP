@@ -13,7 +13,9 @@ export default function App() {
             <Navbar.Text className="text-light">
               Bienvenido, <strong>{user.name}</strong>
             </Navbar.Text>
+            
           )}
+        
         </Container>
       </Navbar>
 
