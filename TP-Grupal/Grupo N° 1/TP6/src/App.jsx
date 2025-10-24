@@ -1,11 +1,13 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
-import IniciarSesion from './Pages/Inicio';
-import Dashboard from './Pages/DashBoard/Dashboard';
-import Artista from './Components/ArtistaCard';
-import Asistente from './Pages/DashBoard/Asistentes';
-import Eventos from './Pages/DashBoard/Eventos';
+
+import IniciarSesion from './Components/FormLogin.jsx'; 
+import Dashboard from './Pages/DashBoard/Dashboard.jsx';
+
+import Artistas from './Pages/DashBoard/Artistas.jsx'; 
+import ArtistaCard from './Components/ArtistaCard.jsx'; 
+import Asistentes from './Pages/DashBoard/Asistentes.jsx';
+import Eventos from './Pages/DashBoard/Eventos.jsx';
+
 function App() {
   return (
     <>
@@ -26,8 +28,10 @@ function App() {
               </p>
             </div>
           } />
-          <Route path='artistas' element={<Artista />} />
-          <Route path='asistentes' element={<Asistente />} />
+
+          <Route path='artistas' element={<Artistas />} /> 
+          
+          <Route path='asistentes' element={<Asistentes />} />
           <Route path='eventos' element={<Eventos />} />
         </Route>
       </Routes>

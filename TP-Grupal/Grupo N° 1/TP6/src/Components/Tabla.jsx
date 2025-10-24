@@ -1,37 +1,67 @@
-import Table from 'react-bootstrap/Table';
 
-function DarkExample() {
+import { Table, Button } from 'react-bootstrap';
+
+function TablaComponent({ 
+  datos, 
+  columnas, 
+  onVerDetalle, 
+  onEliminar 
+}) {
   return (
-    <Table striped bordered hover variant="dark">
+    <Table striped bordered hover variant="light" responsive>
       <thead>
         <tr>
           <th>#</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Username</th>
+          {columnas.map((col, index) => (
+            <th key={index}>{col.header}</th>
+          ))}
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>1</td>
-          <td>Mark</td>
-          <td>Otto</td>
-          <td>@mdo</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Jacob</td>
-          <td>Thornton</td>
-          <td>@fat</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td colSpan={2}>Larry the Bird</td>
-          <td>@twitter</td>
-        </tr>
+        {datos.map((item, index) => (
+          <tr key={item.id}>
+            <td>{index + 1}</td>
+            
+            {columnas.map((col, colIndex) => (
+              <td key={colIndex}>
+                {col.render ? col.render(item) : item[col.field]}
+              </td>
+            ))}
+            
+            <td>
+              {onVerDetalle && (
+                <Button 
+                  variant="info" 
+                  size="sm" 
+                  className="me-2"
+                  onClick={() => onVerDetalle(item)}
+                >
+                  Ver Detalle
+                </Button>
+              )}
+              {onEliminar && (
+                <Button 
+                  variant="danger" 
+                  size="sm"
+                  onClick={() => onEliminar(item)}
+                >
+                  Eliminar
+                </Button>
+              )}
+            </td>
+          </tr>
+        ))}
+        {datos.length === 0 && (
+          <tr>
+            <td colSpan={columnas.length + 2} className="text-center text-muted">
+              No hay datos para mostrar.
+            </td>
+          </tr>
+        )}
       </tbody>
     </Table>
   );
 }
 
-export default DarkExample;
+export default TablaComponent;
