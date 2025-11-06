@@ -1,16 +1,15 @@
-import React from 'react';
-import styled from 'styled-components';
-import Sidebar from '../components/layout/sidebar';
-import MainContent from '../components/layout/maincontent';
-// No se usa DataTable aquí
+import React, { useState } from "react";
+import styled from "styled-components";
+import Sidebar from "../layout/sidebar";
+import MainContent from "../layout/maincontent";
+import { addVenta } from "../services/ventasService";
+import { useFetch } from "../hooks/useFetch";
 
-// Reutilización del layout base de Clientes.jsx
 const PageContainer = styled.div`
   display: flex;
 `;
 
-// Reutilización del ContentWrapper para el contenido principal
-const ContentWrapper = styled.div`
+const FormSection = styled.div`
   background-color: var(--white);
   padding: 25px;
   border-radius: 12px;
@@ -18,57 +17,110 @@ const ContentWrapper = styled.div`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 `;
 
-// Estilos específicos para el formulario de venta
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-`;
-
-const FormRow = styled.div`
-  margin-bottom: 15px;
-`;
-
-const Label = styled.label`
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: var(--text-dark);
-`;
-
 const Input = styled.input`
   width: 100%;
   padding: 10px;
+  margin-top: 5px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.9rem;
-  &:focus {
-    outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+`;
+
+const Button = styled.button`
+  background-color: ${(props) =>
+    props.variant === "secondary" ? "#3B82F6" : "#10B981"};
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.9;
   }
 `;
 
-const PrimaryButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  background-color: var(--primary-blue);
-  color: var(--white);
-  transition: background-color 0.3s ease;
-  &:hover {
-    background-color: var(--primary-blue-dark);
+const ProductosTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  td,
+  th {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
   }
 `;
 
 const Ventas = () => {
+  const { data: clientes, loading: loadingClientes, error: errorClientes } = useFetch("http://localhost:5000/clientes");
+  const { data: productos, loading: loadingProductos, error: errorProductos } = useFetch("http://localhost:5000/productos");
+
+  // Estados locales
+  const [clienteSeleccionado, setClienteSeleccionado] = useState("");
+  const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
+  const [detalle, setDetalle] = useState([]);
+  const [productoSeleccionado, setProductoSeleccionado] = useState("");
+
+  const handleAgregarProducto = () => {
+    const producto = productos.find((p) => String(p.id) === productoSeleccionado);
+    if (!producto) return;
+    setDetalle([...detalle, producto]);
+  };
+
+  const handleEliminarProducto = (id) => {
+    setDetalle(detalle.filter((p) => p.id !== id));
+  };
+
+  const handleFinalizarVenta = async () => {
+    if (!clienteSeleccionado || detalle.length === 0) {
+      alert("Debe seleccionar un cliente y al menos un producto");
+      return;
+    }
+
+    const nuevaVenta = {
+      clienteId: Number(clienteSeleccionado),
+      fecha,
+      productos: detalle.map((p) => ({
+        productoId: p.id,
+        nombre: p.nombre,
+        precio: p.precio,
+      })),
+      total: detalle.reduce((sum, p) => sum + Number(p.precio), 0),
+    };
+
+    try {
+      await addVenta(nuevaVenta);
+      alert("✅ Venta registrada exitosamente");
+      setClienteSeleccionado("");
+      setProductoSeleccionado("");
+      setDetalle([]);
+    } catch (error) {
+      console.error("Error al registrar la venta:", error);
+      alert("❌ Error al registrar la venta");
+    }
+  };
+
+  // Mensajes de carga o error
+  if (loadingClientes || loadingProductos) {
+    return <p style={{ padding: "20px" }}>Cargando datos...</p>;
+  }
+
+  if (errorClientes || errorProductos) {
+    return (
+      <p style={{ padding: "20px", color: "red" }}>
+        Error al cargar datos del servidor.
+      </p>
+    );
+  }
+
   return (
     <PageContainer>
       <Sidebar />
@@ -76,37 +128,89 @@ const Ventas = () => {
         title="Registrar Nueva Venta"
         description="Completa los detalles para procesar la transacción."
       >
-        <ContentWrapper>
-          <form>
-            <FormGrid>
-              <FormRow>
-                <Label htmlFor="cliente">Cliente</Label>
-                {/* En un caso real, esto sería un componente Select o Autocomplete */}
-                <Input id="cliente" type="text" placeholder="Buscar cliente por nombre..." />
-              </FormRow>
-              <FormRow>
-                <Label htmlFor="fecha">Fecha de Venta</Label>
-                <Input id="fecha" type="date" defaultValue={new Date().toISOString().substring(0, 10)} />
-              </FormRow>
-            </FormGrid>
-            
-            {/* Sección para agregar productos (Simplificada) */}
-            <h3 style={{marginTop: '30px', marginBottom: '15px'}}>Detalle de Productos</h3>
-            <ContentWrapper style={{padding: '15px', marginBottom: '25px', borderStyle: 'dashed'}}>
-                <p style={{margin: 0, color: 'var(--text-light)'}}>
-                    [Placeholder para la tabla de productos de la venta]
-                </p>
-                <PrimaryButton style={{marginTop: '10px'}} type="button">
-                    <i className="fa-solid fa-plus"></i> Agregar Producto
-                </PrimaryButton>
-            </ContentWrapper>
-            
-            <PrimaryButton type="submit">
-              <i className="fa-solid fa-paper-plane"></i>
-              Finalizar Venta
-            </PrimaryButton>
-          </form>
-        </ContentWrapper>
+        <FormSection>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            <div>
+              <label>Cliente</label>
+              <Select
+                value={clienteSeleccionado}
+                onChange={(e) => setClienteSeleccionado(e.target.value)}
+              >
+                <option value="">Seleccione un cliente...</option>
+                {clientes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nombre}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <label>Fecha de Venta</label>
+              <Input
+                type="date"
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <h3 style={{ marginTop: "30px" }}>Detalle de Productos</h3>
+          <Select
+            value={productoSeleccionado}
+            onChange={(e) => setProductoSeleccionado(e.target.value)}
+          >
+            <option value="">Seleccione un producto...</option>
+            {productos.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.nombre} - ${p.precio}
+              </option>
+            ))}
+          </Select>
+
+          <Button
+            variant="secondary"
+            style={{ marginTop: "10px" }}
+            onClick={handleAgregarProducto}
+          >
+            Agregar Producto
+          </Button>
+
+          {detalle.length > 0 && (
+            <ProductosTable>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Precio</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {detalle.map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.nombre}</td>
+                    <td>${p.precio}</td>
+                    <td>
+                      <Button onClick={() => handleEliminarProducto(p.id)}>
+                        X
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </ProductosTable>
+          )}
+
+          <h4 style={{ marginTop: "15px" }}>
+            Total: ${detalle.reduce((sum, p) => sum + Number(p.precio), 0)}
+          </h4>
+
+          <Button
+            style={{ marginTop: "20px", backgroundColor: "var(--primary-blue)" }}
+            onClick={handleFinalizarVenta}
+          >
+            Finalizar Venta
+          </Button>
+        </FormSection>
       </MainContent>
     </PageContainer>
   );

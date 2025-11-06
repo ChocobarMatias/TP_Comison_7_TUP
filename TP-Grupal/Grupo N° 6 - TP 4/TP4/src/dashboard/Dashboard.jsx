@@ -1,87 +1,95 @@
-import React, { useEffect, useState } from "react";
-import { Row, Col, Card, Button, ListGroup } from "react-bootstrap";
-import StatCard from "../components/StatCard";
-import DataTable from "../components/DataTable";
-import ProgressRing from "../components/ProgressRing";
-import BarChart from "../components/BarChart";
+import React, { useEffect, useState } from 'react';
+import { Card, Col, Row } from 'react-bootstrap';
+import { BookOpen, UserCheck, BookOpenCheck } from 'lucide-react';
+import { getBooks, getStudents, getLoans } from '../store/dataService'; // Asumo que estas funciones existen
 
-export default function Dashboard(){
-  const [stats, setStats] = useState(null);
-  const [rows,  setRows ] = useState([]);
-  const [percent, setPercent] = useState(45);
+// Componente para una métrica individual
+const MetricCard = ({ title, value, icon: Icon, variant }) => (
+    <Card className={`text-center shadow-lg border-${variant} h-100`}>
+        <Card.Body>
+            <Icon size={32} className={`text-${variant} mb-2`} />
+            <Card.Title className="fw-bold text-muted">{title}</Card.Title>
+            <Card.Text className={`fw-bold fs-1 text-${variant}`}>{value}</Card.Text>
+        </Card.Body>
+    </Card>
+);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setStats([
-        { title: "Earning",  value: "$ 628",   icon: "💳" },
-        { title: "Share",    value: "2434",    icon: "🔗" },
-        { title: "Likes",    value: "1259",    icon: "👍"  },
-        { title: "Rating",   value: "8,5",     icon: "⭐"  },
-      ]);
-      setRows([
-        { id: 1, name: "Juan Pérez", email: "juan@mail.com", role: "Admin" },
-        { id: 2, name: "Ana Díaz",   email: "ana@mail.com",  role: "User"  },
-        { id: 3, name: "Luis ENS",   email: "luis@mail.com", role: "User"  },
-      ]);
-      setPercent(45);
-    }, 300);
-    return () => clearTimeout(t);
-  }, []);
+export default function Dashboard() {
+    const [stats, setStats] = useState({
+        totalLibros: 0,
+        librosDisponibles: 0,
+        totalAlumnos: 0,
+    });
 
-  const bars = [20, 55, 35, 48, 42, 65, 30, 40, 38]; // valores demo
+    useEffect(() => {
+        // Carga de datos para estadísticas
+        const libros = getBooks() || [];
+        const alumnos = getStudents() || [];
 
-  return (
-    <>
-      {/* fila superior de tarjetas */}
-      <Row className="g-3 mb-3">
-        {(stats ?? []).map((s, i) => (
-          <Col sm={6} lg={3} key={i}>
-            <div className="card-appear" style={{ "--i": `${0.05 * i}s` }}>
-              <StatCard title={s.title} value={s.value} icon={s.icon} />
-            </div>
-          </Col>
-        ))}
-      </Row>
+        const totalLibros = libros.length;
+        const librosDisponibles = libros.reduce(
+            (acc, l) => acc + (l.cantidadDisponible || 0),
+            0
+        );
+        const totalAlumnos = alumnos.length;
 
-      <Row className="g-3">
-        {/* panel de barras */}
-        <Col lg={8}>
-          <Card className="shadow-sm glass card-appear" style={{ "--i": ".1s" }}>
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <Card.Title className="mb-0">Result</Card.Title>
-                <Button size="sm" variant="outline-primary">Check Now</Button>
-              </div>
-              <BarChart values={bars} labels={["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP"]}/>
-            </Card.Body>
-          </Card>
+        setStats({
+            totalLibros,
+            librosDisponibles,
+            totalAlumnos,
+        });
+    }, []);
 
-          {/* tabla demo (puede ser otro gráfico en tu grupo) */}
-          <Card className="mt-3 shadow-sm glass card-appear" style={{ "--i": ".15s" }}>
-            <Card.Body>
-              <Card.Title className="mb-3">Usuarios</Card.Title>
-              <DataTable rows={rows}/>
-            </Card.Body>
-          </Card>
-        </Col>
 
-        {/* lateral derecho: anillo + lista */}
-        <Col lg={4}>
-          <Card className="shadow-sm glass card-appear" style={{ "--i": ".12s" }}>
-            <Card.Body className="d-flex flex-column align-items-center">
-              <ProgressRing value={percent}/>
-              <div className="text-center mt-2 mb-3 small text-muted">Completion</div>
-              <ListGroup variant="flush" className="w-100 small">
-                <ListGroup.Item className="glass-subtle">Lorem ipsum</ListGroup.Item>
-                <ListGroup.Item className="glass-subtle">Lorem ipsum</ListGroup.Item>
-                <ListGroup.Item className="glass-subtle">Lorem ipsum</ListGroup.Item>
-                <ListGroup.Item className="glass-subtle">Lorem ipsum</ListGroup.Item>
-              </ListGroup>
-              <Button className="mt-3" size="sm" variant="outline-primary">Check Now</Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </>
-  );
+    return (
+        <div className="p-4">
+            <h1 className="display-6 fw-bold mb-4">Resumen de la Biblioteca</h1>
+
+            {/* Fila de Métricas Clave */}
+            <Row xs={1} md={3} className="g-4 mb-5">
+                <Col>
+                    <MetricCard 
+                        title="Títulos Registrados"
+                        value={stats.totalLibros}
+                        icon={BookOpen}
+                        variant="primary"
+                    />
+                </Col>
+                <Col>
+                    <MetricCard 
+                        title="Unidades Disponibles"
+                        value={stats.librosDisponibles}
+                        icon={BookOpenCheck}
+                        variant="success"
+                    />
+                </Col>
+                <Col>
+                    <MetricCard 
+                        title="Alumnos Registrados"
+                        value={stats.totalAlumnos}
+                        icon={UserCheck}
+                        variant="info"
+                    />
+                </Col>
+            </Row>
+
+            {/* Sección de Bienvenida/Instrucciones */}
+            <Card className="shadow-lg border-light">
+                <Card.Body>
+                    <Card.Title className="fs-4">Plataforma de Gestión</Card.Title>
+                    <Card.Text className="lead text-muted">
+                        Utiliza el **Panel de Biblioteca** en el lateral izquierdo para acceder a las secciones de gestión:
+                    </Card.Text>
+                    <ul>
+                        <li>**Libros:** Para registrar, editar y consultar el inventario de la colección.</li>
+                        <li>**Alumnos:** Para administrar el registro de los estudiantes.</li>
+                        <li>**Préstamos:** Para gestionar los préstamos y devoluciones activos.</li>
+                    </ul>
+                    <Card.Text className="text-sm fst-italic mt-3">
+                        Los indicadores de préstamos activos, por vencer y vencidos se muestran en tiempo real en la barra lateral.
+                    </Card.Text>
+                </Card.Body>
+            </Card>
+        </div>
+    );
 }

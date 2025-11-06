@@ -11,6 +11,8 @@ import StudentsPage from "../pages/Students/StudentsPage";
 import RegisterStudentPage from "../pages/Students/RegisterStudentPage";
 import EnrollmentsPage from "../pages/Enrollments/EnrollmentsPage";
 import CreateEnrollmentPage from "../pages/Enrollments/CreateEnrollmentPage.jsx"
+import NotFoundPage from "../pages/NotFoundPage";
+
 
 export default function AppRouter() {
   return (
@@ -18,6 +20,7 @@ export default function AppRouter() {
       <Routes>
         {/* Página pública */}
         <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="*" element={<NotFoundPage />} />
         <Route
           path="/login"
           element={

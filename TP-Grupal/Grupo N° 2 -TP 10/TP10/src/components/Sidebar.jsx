@@ -1,57 +1,60 @@
-import { useState } from "react";
+// components/Sidebar.jsx
+import { Link, useLocation } from 'react-router-dom'; 
 import { ListGroup } from "react-bootstrap";
-import { House, Scissors, People, Calendar, Gear } from "react-bootstrap-icons";
-import "../styles/sidebar.css"; // 👈 importamos el CSS externo
+import { House, Scissors, People, Calendar } from "react-bootstrap-icons";
+import "../styles/sidebar.css";
 
-export default function Sidebar({ onSelect }) {
-  const [active, setActive] = useState("Dashboard");
+export default function Sidebar() {
+  const location = useLocation(); 
 
-  const handleSelect = (item) => {
-    setActive(item);
-    onSelect(item);
-  };
+  
+  const isActive = (path) => location.pathname === path;
 
   return (
     <div className="sidebar-container">
       <h4 className="sidebar-title">💈 Peluquería</h4>
-
       <ListGroup variant="flush" className="sidebar-list">
+
+        
         <ListGroup.Item
+          as={Link}
+          to="/app/dashboard" 
           action
-          active={active === "Dashboard"}
-          onClick={() => handleSelect("Dashboard")}
+          active={isActive("/app/dashboard")}
           className="sidebar-item"
         >
           <House /> Dashboard
         </ListGroup.Item>
 
         <ListGroup.Item
+          as={Link}
+          to="/app/clientes"
           action
-          active={active === "Clientes"}
-          onClick={() => handleSelect("Clientes")}
+          active={isActive("/app/clientes")}
           className="sidebar-item"
         >
           <People /> Clientes
         </ListGroup.Item>
-
-        <ListGroup.Item
+<ListGroup.Item
+          as={Link}
+          to="/app/servicios"
           action
-          active={active === "Turnos"}
-          onClick={() => handleSelect("Turnos")}
-          className="sidebar-item"
-        >
-          <Calendar /> Turnos
-        </ListGroup.Item>
-
-          <ListGroup.Item
-          action
-          active={active === "Servicios"}
-          onClick={() => handleSelect("Servicios")}
+          active={isActive("/app/servicios")}
           className="sidebar-item"
         >
           <Scissors /> Servicios
         </ListGroup.Item>
 
+        <ListGroup.Item
+          as={Link}
+          to="/app/turnos"
+          action
+          active={isActive("/app/turnos")}
+          className="sidebar-item"
+        >
+          <Calendar /> Turnos
+        </ListGroup.Item>
+        
 
       </ListGroup>
     </div>

@@ -1,37 +1,18 @@
 import React from 'react';
 import { Container, Row, Col, Spinner, Alert } from 'react-bootstrap';
-import { dataCards, usuarios } from '../../utils/fakeData'; 
+import { useFetch } from '../../hooks/useFetch';
+import { getMiembros } from '../../services/miembrosService';
+import { getDataCards } from '../../services/reportesService';
 import CardComponent from '../../components/Card';
 import TablaUser from '../../components/TablaUser';
 import { PeopleFill, PersonCheckFill, PersonXFill } from 'react-bootstrap-icons';
 
 const Dashboard = () => {
-  const [metrics, setMetrics] = React.useState(null);
-  const [users, setUsers] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
+  const { data: metrics, loading: loadingMetrics, error: errorMetrics } = useFetch(getDataCards);
+  const { data: users, loading: loadingUsers, error: errorUsers } = useFetch(getMiembros);
 
-React.useEffect(() => {
-  // 1. El setTimeout sigue estando fuera
-  const timer = setTimeout(() => {
-    try {
-
-      setMetrics(dataCards);
-      setUsers(usuarios);
-
-    } catch (err) {
-      console.error(err); 
-      setError('Error al cargar los datos.');
-    } finally {
-    
-      setLoading(false);
-    }
-  }, 1000);
-
-
-  return () => clearTimeout(timer);
-
-}, []);
+  const loading = loadingMetrics || loadingUsers;
+  const error = errorMetrics || errorUsers;
 
   if (loading) {
     return (
@@ -54,35 +35,37 @@ React.useEffect(() => {
     <Container fluid className="p-4">
       <Row className="mb-4">
         <Col>
-          <h1 className="h2">Dashboard (con datos falsos)</h1>
+          <h1 className="h2">Dashboard</h1>
         </Col>
       </Row>
 
-      <Row className="mb-4">
-        <CardComponent
-          titulo="Miembros Totales"
-          valor={metrics.totalSocios}
-          variante="primary"
-          icono={<PeopleFill />}
-        />
-        <CardComponent
-          titulo="Miembros Activos"
-          valor={metrics.sociosActivos}
-          variante="success"
-          icono={<PersonCheckFill />}
-        />
-        <CardComponent
-          titulo="Miembros Inactivos"
-          valor={metrics.sociosInactivos}
-          variante="danger" 
-          icono={<PersonXFill />}
-        />
-      </Row>
+      {metrics && (
+        <Row className="mb-4">
+          <CardComponent
+            titulo="Miembros Totales"
+            valor={metrics.totalSocios}
+            variante="primary"
+            icono={<PeopleFill />}
+          />
+          <CardComponent
+            titulo="Miembros Activos"
+            valor={metrics.sociosActivos}
+            variante="success"
+            icono={<PersonCheckFill />}
+          />
+          <CardComponent
+            titulo="Miembros Inactivos"
+            valor={metrics.sociosInactivos}
+            variante="danger" 
+            icono={<PersonXFill />}
+          />
+        </Row>
+      )}
 
       <Row>
         <Col>
           <h2 className="h4 mb-3">Usuarios</h2>
-          <TablaUser usuarios={users} />
+          {users && <TablaUser usuarios={users} />}
         </Col>
       </Row>
     </Container>

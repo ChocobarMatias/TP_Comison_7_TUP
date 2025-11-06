@@ -1,28 +1,49 @@
-import MainLayout from '../layout/MainLayout'
-import Dashboard from '../pages/Dashboard'
-import Login from '../pages/Login'
-import Clients from '../pages/Clients'
-import Services from '../pages/Services'
-import Appointments from '../pages/Appointments'
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 
-//Este archivo servirá para manejar las rutas del sistema más adelante
+import MainLayout from '../layout/MainLayout';
+import RouterProtect from './RouterProtect'; 
+
+
+import Login from '../pages/Login';
+import Dashboard from '../pages/Dashboard';
+import Clients from '../pages/Clients';
+import Services from '../pages/Services';
+import Appointments from '../pages/Appointments';
 
 export default function AppRouter() {
-  return (
-    <Router>
-      <Routes>
-        {/* Login (inicio de sesión simulado) */}
-        <Route path="/" element={<Login />} />
+  const isLogged = localStorage.getItem('isLogged') === 'true';
 
-        {/* Main Layout con las páginas dentro */}
-        <Route path="/app" element={<MainLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="clientes" element={<Clients />} />
-          <Route path="servicios" element={<Services />} />
-          <Route path="turnos" element={<Appointments />} />
-        </Route>
-      </Routes>
-    </Router>
+  return (
+    <Routes>
+     
+      <Route
+        path="/"
+        element={isLogged ? <Navigate to="/app/dashboard" replace /> : <Login />}
+      />
+
+      
+      <Route
+        path="/app"
+        element={
+          <RouterProtect>
+            <MainLayout />
+          </RouterProtect>
+        }
+      >
+       
+        <Route index element={<Navigate to="dashboard" replace />} />
+        
+        
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="clientes" element={<Clients />} />
+        <Route path="servicios" element={<Services />} />
+        <Route path="turnos" element={<Appointments />} />
+      </Route>
+
+      
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }

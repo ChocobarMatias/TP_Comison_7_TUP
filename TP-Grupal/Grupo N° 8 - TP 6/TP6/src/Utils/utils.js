@@ -1,127 +1,160 @@
+// Archivo: src/Utils/utils.js
 
+// Clave única para guardar nuestros datos en el localStorage del navegador
+const DB_KEY = 'culturaAppDB';
 
-export const db = {
-  asistentes: [
-    { id: 1, nombre: "Juan", apellido: "Pérez", fechaNac: '30-10-2001' },
-    { id: 2, nombre: "Lucía", apellido: "Gómez", fechaNac: '20-01-1999' },
-    { id: 3, nombre: "Carlos", apellido: "Ruiz", fechaNac: '15-03-2004' }
-  ],
-  eventos: [
-    { id: 1, nombre: "Feria Del Condado", fecha: "21-11-2025", lugar: "Parque 9 De Julio", cupo: 10, artistas: [], asistentes: [] },
-    { id: 2, nombre: "La Expo", fecha: "22-12-2025", lugar: "Laprida y Corrientes", cupo: 20, artistas: [], asistentes: [] }
-  ],
+// Función para cargar la base de datos
+function loadDB() {
+  const data = localStorage.getItem(DB_KEY);
+  if (data) {
+    return JSON.parse(data);
+  }
+  // Si no hay nada guardado, usamos los datos iniciales
+  return {
+    asistentes: [
+      { id: 1, nombre: "Juan", apellido: "Pérez", fechaNac: '2001-10-30' },
+      { id: 2, nombre: "Lucía", apellido: "Gómez", fechaNac: '1999-01-20' },
+      { id: 3, nombre: "Carlos", apellido: "Ruiz", fechaNac: '2004-03-15' }
+    ],
+    eventos: [
+      { id: 1, nombre: "Feria Del Condado", fecha: "21-11-2025", lugar: "Parque 9 De Julio", cupo: 10, artistas: [], asistentes: [] },
+      { id: 2, nombre: "La Expo", fecha: "22-12-2025", lugar: "Laprida y Corrientes", cupo: 20, artistas: [], asistentes: [] }
+    ],
     artistas: [
-    { id: 1, nombre: "Miguel", apellido: "Martin",nombreArt: "Gordillo",dni: 23123456 ,fechaNac: '30-10-1989' },
-    { id: 2, nombre: "Maria", apellido: "Becerra",nombreArt: "La Nena Argentina",dni: 24627416 ,fechaNac: '15-04-1988' },
-    { id: 3, nombre: "Mauro", apellido: "Monzon",nombreArt: "Lit-Killa",dni: 2234564 ,fechaNac: '12-12-1985' },
-  ],
+      { id: 1, nombre: "Miguel", apellido: "Martin",nombreArt: "Gordillo",dni: "23123456" ,fechaNac: '1989-10-30', disponible: true },
+      { id: 2, nombre: "Maria", apellido: "Becerra",nombreArt: "La Nena Argentina",dni: "24627416" ,fechaNac: '1988-04-15', disponible: true },
+      { id: 3, nombre: "Mauro", apellido: "Monzon",nombreArt: "Lit-Killa",dni: "2234564" ,fechaNac: '1985-12-12', disponible: true },
+    ],
     usuarios: [
-    { id: 1, email: "Usuario@gmail.com", contrasenia: "123456", rol: "admin" },
-  ],
-};
-
-// Funciones para "consultar" la base
-export function getAll(tabla) {
-  return db[tabla] || [];
+      { id: 1, email: "Usuario@gmail.com", contrasenia: "123456", rol: "admin" },
+    ],
+  };
 }
 
-export function getById(tabla, id) {
-  return db[tabla]?.find(item => item.id === id)  || null;
+function saveDB() {
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
 }
+
+let db = loadDB();
+saveDB();
+
+export function getAll(tabla) { return db[tabla] || []; }
+export function getById(tabla, id) { return db[tabla]?.find(item => item.id === id) || null; }
 
 export function addItem(tabla, nuevo) {
-  db[tabla].push({ id: Date.now(), ...nuevo });
+  const itemAAgregar = tabla === 'artistas' ? { ...nuevo, disponible: true } : nuevo;
+  db[tabla].push({ id: Date.now(), ...itemAAgregar });
+  saveDB();
+}
+
+export function updateItem(tabla, id, itemActualizado) {
+  const index = db[tabla].findIndex(item => item.id === id);
+  if (index !== -1) {
+    db[tabla][index] = { ...db[tabla][index], ...itemActualizado };
+    saveDB();
+  }
 }
 
 export function deleteById(tabla, id) {
+  if (tabla === 'eventos') {
+    const eventoAEliminar = getById('eventos', id);
+    if (eventoAEliminar && eventoAEliminar.artistas.length > 0) {
+      eventoAEliminar.artistas.forEach(artistaEnEvento => {
+        const artistaOriginal = getById('artistas', artistaEnEvento.id);
+        if (artistaOriginal) {
+          artistaOriginal.disponible = true;
+        }
+      });
+    }
+  }
+  
+  // --- NUEVA LÓGICA ---
+  // Si eliminamos un asistente, también lo quitamos de todos los eventos.
+  if (tabla === 'asistentes') {
+    db.eventos.forEach(evento => {
+        evento.asistentes = evento.asistentes.filter(asistente => asistente.id !== id);
+    });
+  }
+  
+  // --- NUEVA LÓGICA ---
+  // Si eliminamos un artista, lo quitamos de todos los eventos.
+  if (tabla === 'artistas') {
+     db.eventos.forEach(evento => {
+        evento.artistas = evento.artistas.filter(artista => artista.id !== id);
+    });
+  }
+
   db[tabla] = db[tabla].filter(item => item.id !== id);
+  saveDB();
 }
 
-
-//  Agregar artista a un evento
+// --- Lógica de Artistas (Sin cambios) ---
 export function agregarArtistaAEvento(idEvento, idArtista) {
-  const evento = db.eventos.find(e => e.id === idEvento);
-  const artista = db.artistas.find(a => a.id === idArtista);
+  const evento = getById('eventos', idEvento);
+  const artista = getById('artistas', idArtista);
 
-  if (!evento) {
-    console.error(" Evento no encontrado");
-    return;
+  if (!evento || !artista) {
+    return { success: false, message: "Error: Evento o artista no encontrado." };
   }
-  if (!artista) {
-    console.error(" Artista no encontrado");
-    return;
+  if (!artista.disponible) {
+    return { success: false, message: `El artista ${artista.nombreArt} ya se encuentra ocupado.` };
   }
-
   const yaExiste = evento.artistas.some(a => a.id === idArtista);
   if (yaExiste) {
-    console.warn(" El artista ya está asociado a este evento");
-    return;
+    return { success: false, message: `El artista ${artista.nombreArt} ya está asociado a este evento.` };
   }
 
   evento.artistas.push(artista);
-  console.log(`Artista ${artista.nombreArt} agregado a ${evento.nombre}`);
+  artista.disponible = false;
+  saveDB();
+  return { success: true, message: `¡${artista.nombreArt} se agregó al evento!` };
 }
 
-// Agregar asistente a un evento
-export function agregarAsistenteAEvento(idEvento, idAsistente) {
-  const evento = db.eventos.find(e => e.id === idEvento);
-  const asistente = db.asistentes.find(a => a.id === idAsistente);
+export function removerArtistaDeEvento(idEvento, idArtista) {
+    const evento = getById('eventos', idEvento);
+    if (!evento) { return; }
+    evento.artistas = evento.artistas.filter(artista => artista.id !== idArtista);
+    const artistaLiberado = getById('artistas', idArtista);
+    if (artistaLiberado) {
+      artistaLiberado.disponible = true;
+    }
+    saveDB();
+}
 
-  if (!evento) {
-    console.error(" Evento no encontrado");
-    return;
-  }
-  if (!asistente) {
-    console.error(" Asistente no encontrado");
-    return;
-  }
+// --- ¡FUNCIÓN MODIFICADA Y FUNCIÓN NUEVA! ---
 
-  // Controlar cupo
+// Esta es tu 'agregarAsistenteAEvento' pero con mejor feedback
+export function inscribirAsistenteAEvento(idEvento, idAsistente) {
+  const evento = getById('eventos', idEvento);
+  const asistente = getById('asistentes', idAsistente);
+
+  if (!evento || !asistente) {
+    return { success: false, message: "Error: Evento o asistente no encontrado." };
+  }
+  // Control de Cupo
   if (evento.asistentes.length >= evento.cupo) {
-    console.warn(" No hay más cupos disponibles en este evento");
-    return;
+    return { success: false, message: "¡Cupo completo! No se pueden inscribir más asistentes." };
   }
-
   const yaExiste = evento.asistentes.some(a => a.id === idAsistente);
   if (yaExiste) {
-    console.warn(" El asistente ya está registrado en este evento");
-    return;
+    return { success: false, message: "Este asistente ya está inscrito en el evento." };
   }
 
   evento.asistentes.push(asistente);
-  console.log(` Asistente ${asistente.nombre} agregado a ${evento.nombre}`);
+  saveDB();
+  return { success: true, message: "¡Asistente inscrito correctamente!" };
 }
 
-//  Mostrar detalle de un evento
-export function mostrarEvento(idEvento) {
-  const evento = db.eventos.find(e => e.id === idEvento);
-  if (!evento) {
-    console.error(" Evento no encontrado");
-    return;
-  }
-
-  console.log(` ${evento.nombre} (${evento.lugar})`);
-  console.log(` Artistas (${evento.artistas.length}):`);
-  evento.artistas.forEach(a => console.log(` - ${a.nombreArt}`));
-
-  console.log(`Asistentes (${evento.asistentes.length}/${evento.cupo}):`);
-  evento.asistentes.forEach(a => console.log(` - ${a.nombre} ${a.apellido}`));
+// Nueva función para quitar asistentes
+export function removerAsistenteDeEvento(idEvento, idAsistente) {
+    const evento = getById('eventos', idEvento);
+    if (!evento) { return; }
+    evento.asistentes = evento.asistentes.filter(asistente => asistente.id !== idAsistente);
+    saveDB();
 }
+
 
 export function getUsuarioPorEmail(email) {
-  if (!email) {
-    console.error(" Debes ingresar un email válido");
-    return null;
-  }
-
-  const usuario = db.usuarios.find(
-    (u) => u.email.toLowerCase() === email.toLowerCase()
-  );
-
-  if (!usuario) {
-    console.warn(" Usuario no encontrado");
-    return null;
-  }
-
-  return usuario;
+  if (!email) return null;
+  return db.usuarios.find(u => u.email.toLowerCase() === email.toLowerCase()) || null;
 }

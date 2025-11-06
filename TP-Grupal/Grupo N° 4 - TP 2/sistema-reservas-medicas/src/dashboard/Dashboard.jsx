@@ -1,96 +1,109 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Form, Button, Badge, InputGroup, Alert } from 'react-bootstrap';
-import { ESPECIALIDADES, STATUS_TURNO } from '../constants';
-import Modal from '../components/Modal';
-import TurnoForm from '../components/TurnoForm';
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  Form,
+  Button,
+  Badge,
+  InputGroup,
+  Alert,
+} from "react-bootstrap";
+import { ESPECIALIDADES, STATUS_TURNO } from "../constants";
+import Modal from "../components/Modal";
+import TurnoForm from "../components/TurnoForm";
+import { useAuth } from "../hooks/useAuth";
 
 const Dashboard = () => {
+  const { user, isAuthenticated } = useAuth();
   const [turnos, setTurnos] = useState([]);
   const [turnosFiltrados, setTurnosFiltrados] = useState([]);
   const [filtros, setFiltros] = useState({
-    fecha: '',
-    especialidad: '',
-    busqueda: ''
+    fecha: "",
+    especialidad: "",
+    busqueda: "",
   });
   const [estadisticas, setEstadisticas] = useState({
     total: 0,
     confirmados: 0,
     pendientes: 0,
-    cancelados: 0
+    cancelados: 0,
   });
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('nuevo'); // 'nuevo' o 'editar'
+  const [modalType, setModalType] = useState("nuevo"); // 'nuevo' o 'editar'
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
 
   useEffect(() => {
     // Datos simulados más completos para el dashboard
     const datosSimulados = [
-      { 
-        id: 1, 
-        paciente: 'Juan Pérez', 
-        medico: 'Dr. García', 
-        fecha: '2024-10-25', 
-        hora: '09:00', 
-        especialidad: 'Cardiología',
-        status: 'Confirmado',
-        telefono: '123-456-7890',
-        email: 'juan.perez@email.com'
+      {
+        id: 1,
+        paciente: "Juan Pérez",
+        medico: "Dr. García",
+        fecha: "2024-10-25",
+        hora: "09:00",
+        especialidad: "Cardiología",
+        status: "Confirmado",
+        telefono: "123-456-7890",
+        email: "juan.perez@email.com",
       },
-      { 
-        id: 2, 
-        paciente: 'María López', 
-        medico: 'Dra. Martínez', 
-        fecha: '2024-10-25', 
-        hora: '10:30', 
-        especialidad: 'Pediatría',
-        status: 'Pendiente',
-        telefono: '098-765-4321',
-        email: 'maria.lopez@email.com'
+      {
+        id: 2,
+        paciente: "María López",
+        medico: "Dra. Martínez",
+        fecha: "2024-10-25",
+        hora: "10:30",
+        especialidad: "Pediatría",
+        status: "Pendiente",
+        telefono: "098-765-4321",
+        email: "maria.lopez@email.com",
       },
-      { 
-        id: 3, 
-        paciente: 'Carlos Ruiz', 
-        medico: 'Dr. Fernández', 
-        fecha: '2024-10-25', 
-        hora: '11:00', 
-        especialidad: 'Traumatología',
-        status: 'Confirmado',
-        telefono: '555-123-4567',
-        email: 'carlos.ruiz@email.com'
+      {
+        id: 3,
+        paciente: "Carlos Ruiz",
+        medico: "Dr. Fernández",
+        fecha: "2024-10-25",
+        hora: "11:00",
+        especialidad: "Traumatología",
+        status: "Confirmado",
+        telefono: "555-123-4567",
+        email: "carlos.ruiz@email.com",
       },
-      { 
-        id: 4, 
-        paciente: 'Ana García', 
-        medico: 'Dra. Rodríguez', 
-        fecha: '2024-10-25', 
-        hora: '14:00', 
-        especialidad: 'Dermatología',
-        status: 'Pendiente',
-        telefono: '777-888-9999',
-        email: 'ana.garcia@email.com'
+      {
+        id: 4,
+        paciente: "Ana García",
+        medico: "Dra. Rodríguez",
+        fecha: "2024-10-25",
+        hora: "14:00",
+        especialidad: "Dermatología",
+        status: "Pendiente",
+        telefono: "777-888-9999",
+        email: "ana.garcia@email.com",
       },
-      { 
-        id: 5, 
-        paciente: 'Luis Morales', 
-        medico: 'Dr. Silva', 
-        fecha: '2024-10-25', 
-        hora: '15:30', 
-        especialidad: 'Neurología',
-        status: 'Cancelado',
-        telefono: '333-444-5555',
-        email: 'luis.morales@email.com'
+      {
+        id: 5,
+        paciente: "Luis Morales",
+        medico: "Dr. Silva",
+        fecha: "2024-10-25",
+        hora: "15:30",
+        especialidad: "Neurología",
+        status: "Cancelado",
+        telefono: "333-444-5555",
+        email: "luis.morales@email.com",
       },
-      { 
-        id: 6, 
-        paciente: 'Elena Vargas', 
-        medico: 'Dra. Castro', 
-        fecha: '2024-10-26', 
-        hora: '08:30', 
-        especialidad: 'Ginecología',
-        status: 'Confirmado',
-        telefono: '666-777-8888',
-        email: 'elena.vargas@email.com'
-      }
+      {
+        id: 6,
+        paciente: "Elena Vargas",
+        medico: "Dra. Castro",
+        fecha: "2024-10-26",
+        hora: "08:30",
+        especialidad: "Ginecología",
+        status: "Confirmado",
+        telefono: "666-777-8888",
+        email: "elena.vargas@email.com",
+      },
     ];
     setTurnos(datosSimulados);
     setTurnosFiltrados(datosSimulados);
@@ -100,9 +113,9 @@ const Dashboard = () => {
     // Calcular estadísticas
     const stats = {
       total: turnos.length,
-      confirmados: turnos.filter(t => t.status === 'Confirmado').length,
-      pendientes: turnos.filter(t => t.status === 'Pendiente').length,
-      cancelados: turnos.filter(t => t.status === 'Cancelado').length
+      confirmados: turnos.filter((t) => t.status === "Confirmado").length,
+      pendientes: turnos.filter((t) => t.status === "Pendiente").length,
+      cancelados: turnos.filter((t) => t.status === "Cancelado").length,
     };
     setEstadisticas(stats);
   }, [turnos]);
@@ -112,19 +125,22 @@ const Dashboard = () => {
     let filtrados = turnos;
 
     if (filtros.fecha) {
-      filtrados = filtrados.filter(turno => turno.fecha === filtros.fecha);
+      filtrados = filtrados.filter((turno) => turno.fecha === filtros.fecha);
     }
 
     if (filtros.especialidad) {
-      filtrados = filtrados.filter(turno => turno.especialidad === filtros.especialidad);
+      filtrados = filtrados.filter(
+        (turno) => turno.especialidad === filtros.especialidad
+      );
     }
 
     if (filtros.busqueda) {
       const busqueda = filtros.busqueda.toLowerCase();
-      filtrados = filtrados.filter(turno => 
-        turno.paciente.toLowerCase().includes(busqueda) ||
-        turno.medico.toLowerCase().includes(busqueda) ||
-        turno.especialidad.toLowerCase().includes(busqueda)
+      filtrados = filtrados.filter(
+        (turno) =>
+          turno.paciente.toLowerCase().includes(busqueda) ||
+          turno.medico.toLowerCase().includes(busqueda) ||
+          turno.especialidad.toLowerCase().includes(busqueda)
       );
     }
 
@@ -132,34 +148,34 @@ const Dashboard = () => {
   }, [turnos, filtros]);
 
   const handleFiltroChange = (campo, valor) => {
-    setFiltros(prev => ({
+    setFiltros((prev) => ({
       ...prev,
-      [campo]: valor
+      [campo]: valor,
     }));
   };
 
   const limpiarFiltros = () => {
     setFiltros({
-      fecha: '',
-      especialidad: '',
-      busqueda: ''
+      fecha: "",
+      especialidad: "",
+      busqueda: "",
     });
   };
 
   const handleAccionTurno = (id, accion) => {
     let nuevosTurnos = [...turnos];
-    const turnoIndex = nuevosTurnos.findIndex(t => t.id === id);
-    
+    const turnoIndex = nuevosTurnos.findIndex((t) => t.id === id);
+
     if (turnoIndex !== -1) {
       switch (accion) {
-        case 'confirmar':
-          nuevosTurnos[turnoIndex].status = 'Confirmado';
+        case "confirmar":
+          nuevosTurnos[turnoIndex].status = "Confirmado";
           break;
-        case 'cancelar':
-          nuevosTurnos[turnoIndex].status = 'Cancelado';
+        case "cancelar":
+          nuevosTurnos[turnoIndex].status = "Cancelado";
           break;
-        case 'eliminar':
-          nuevosTurnos = nuevosTurnos.filter(t => t.id !== id);
+        case "eliminar":
+          nuevosTurnos = nuevosTurnos.filter((t) => t.id !== id);
           break;
         default:
           break;
@@ -169,25 +185,27 @@ const Dashboard = () => {
   };
 
   const handleNuevoTurno = () => {
-    setModalType('nuevo');
+    setModalType("nuevo");
     setTurnoSeleccionado(null);
     setShowModal(true);
   };
 
   const handleEditarTurno = (id) => {
-    const turno = turnos.find(t => t.id === id);
+    const turno = turnos.find((t) => t.id === id);
     if (turno) {
-      setModalType('editar');
+      setModalType("editar");
       setTurnoSeleccionado(turno);
       setShowModal(true);
     }
   };
 
   const handleSaveTurno = (turnoData) => {
-    if (modalType === 'nuevo') {
-      setTurnos(prev => [...prev, turnoData]);
+    if (modalType === "nuevo") {
+      setTurnos((prev) => [...prev, turnoData]);
     } else {
-      setTurnos(prev => prev.map(t => t.id === turnoData.id ? turnoData : t));
+      setTurnos((prev) =>
+        prev.map((t) => (t.id === turnoData.id ? turnoData : t))
+      );
     }
     setShowModal(false);
     setTurnoSeleccionado(null);
@@ -200,18 +218,32 @@ const Dashboard = () => {
 
   const getStatusBadge = (status) => {
     const variants = {
-      'Confirmado': 'success',
-      'Pendiente': 'warning',
-      'Cancelado': 'danger',
-      'Completado': 'info'
+      Confirmado: "success",
+      Pendiente: "warning",
+      Cancelado: "danger",
+      Completado: "info",
     };
-    return <Badge bg={variants[status] || 'secondary'}>{status}</Badge>;
+    return <Badge bg={variants[status] || "secondary"}>{status}</Badge>;
   };
 
-  const fechaHoy = new Date().toISOString().split('T')[0];
+  const fechaHoy = new Date().toISOString().split("T")[0];
 
   return (
     <Container className="mt-4">
+      {/* Encabezado con Usuario */}
+      {isAuthenticated && user && (
+        <Row className="mb-3">
+          <Col>
+            <Alert variant="info" className="mb-0">
+              <strong>Bienvenido/a, {user.email}</strong>
+              <span className="float-end">
+                <Badge bg="success">Autenticado</Badge>
+              </span>
+            </Alert>
+          </Col>
+        </Row>
+      )}
+
       {/* Estadísticas */}
       <Row className="mb-4">
         <Col md={3}>
@@ -263,7 +295,9 @@ const Dashboard = () => {
                     <Form.Control
                       type="date"
                       value={filtros.fecha}
-                      onChange={(e) => handleFiltroChange('fecha', e.target.value)}
+                      onChange={(e) =>
+                        handleFiltroChange("fecha", e.target.value)
+                      }
                     />
                   </Form.Group>
                 </Col>
@@ -272,11 +306,15 @@ const Dashboard = () => {
                     <Form.Label>Especialidad</Form.Label>
                     <Form.Select
                       value={filtros.especialidad}
-                      onChange={(e) => handleFiltroChange('especialidad', e.target.value)}
+                      onChange={(e) =>
+                        handleFiltroChange("especialidad", e.target.value)
+                      }
                     >
                       <option value="">Todas las especialidades</option>
-                      {ESPECIALIDADES.map(esp => (
-                        <option key={esp} value={esp}>{esp}</option>
+                      {ESPECIALIDADES.map((esp) => (
+                        <option key={esp} value={esp}>
+                          {esp}
+                        </option>
                       ))}
                     </Form.Select>
                   </Form.Group>
@@ -289,10 +327,12 @@ const Dashboard = () => {
                         type="text"
                         placeholder="Buscar por paciente, médico o especialidad..."
                         value={filtros.busqueda}
-                        onChange={(e) => handleFiltroChange('busqueda', e.target.value)}
+                        onChange={(e) =>
+                          handleFiltroChange("busqueda", e.target.value)
+                        }
                       />
-                      <Button 
-                        variant="outline-secondary" 
+                      <Button
+                        variant="outline-secondary"
                         onClick={limpiarFiltros}
                       >
                         Limpiar
@@ -337,14 +377,16 @@ const Dashboard = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {turnosFiltrados.map(turno => (
+                      {turnosFiltrados.map((turno) => (
                         <tr key={turno.id}>
                           <td>{turno.id}</td>
                           <td>
                             <div>
                               <strong>{turno.paciente}</strong>
                               <br />
-                              <small className="text-muted">{turno.email}</small>
+                              <small className="text-muted">
+                                {turno.email}
+                              </small>
                             </div>
                           </td>
                           <td>{turno.medico}</td>
@@ -354,35 +396,41 @@ const Dashboard = () => {
                           <td>{getStatusBadge(turno.status)}</td>
                           <td>
                             <div className="d-flex gap-1">
-                              {turno.status === 'Pendiente' && (
-                                <Button 
-                                  variant="success" 
+                              {turno.status === "Pendiente" && (
+                                <Button
+                                  variant="success"
                                   size="sm"
-                                  onClick={() => handleAccionTurno(turno.id, 'confirmar')}
+                                  onClick={() =>
+                                    handleAccionTurno(turno.id, "confirmar")
+                                  }
                                 >
                                   ✓
                                 </Button>
                               )}
-                              {turno.status !== 'Cancelado' && (
-                                <Button 
-                                  variant="warning" 
+                              {turno.status !== "Cancelado" && (
+                                <Button
+                                  variant="warning"
                                   size="sm"
-                                  onClick={() => handleAccionTurno(turno.id, 'cancelar')}
+                                  onClick={() =>
+                                    handleAccionTurno(turno.id, "cancelar")
+                                  }
                                 >
                                   ✗
                                 </Button>
                               )}
-                              <Button 
-                                variant="outline-primary" 
+                              <Button
+                                variant="outline-primary"
                                 size="sm"
                                 onClick={() => handleEditarTurno(turno.id)}
                               >
                                 ✏️
                               </Button>
-                              <Button 
-                                variant="outline-danger" 
+                              <Button
+                                variant="outline-danger"
                                 size="sm"
-                                onClick={() => handleAccionTurno(turno.id, 'eliminar')}
+                                onClick={() =>
+                                  handleAccionTurno(turno.id, "eliminar")
+                                }
                               >
                                 🗑️
                               </Button>
@@ -403,7 +451,7 @@ const Dashboard = () => {
       <Modal
         show={showModal}
         onHide={handleCloseModal}
-        title={modalType === 'nuevo' ? 'Nuevo Turno' : 'Editar Turno'}
+        title={modalType === "nuevo" ? "Nuevo Turno" : "Editar Turno"}
         onSave={() => {}} // Se maneja en el formulario
         onCancel={handleCloseModal}
         saveText="Guardar"

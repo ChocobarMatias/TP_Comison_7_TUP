@@ -1,38 +1,31 @@
-import { useState } from 'react'
-import Sidebar from '../components/Sidebar'
-import Dashboard from '../pages/Dashboard'
-import Clients from '../pages/Clients'
-import Services from '../pages/Services'
-import Appointments from '../pages/Appointments'
 
+import { Outlet, useNavigate } from 'react-router-dom'; 
+import Sidebar from '../components/Sidebar';
 import "../styles/layout.css"; 
 
-export default function MainLayout({ onLogout }) {
-  const [section, setSection] = useState("Dashboard");
+export default function MainLayout() {
+  const navigate = useNavigate();
 
-  const renderSection = () => {
-    switch (section) {
-      case "Clientes":
-        return <Clients />;
-      case "Servicios":
-        return <Services />;
-      case "Turnos":
-        return <Appointments />;
-      default:
-        return <Dashboard />;
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('isLogged'); 
+    navigate('/'); 
   };
 
   return (
     <div className="layout-container">
-      <Sidebar onSelect={setSection} />
+      
+      <Sidebar /> 
+      
       <div className="layout-content">
         <div className="d-flex justify-content-end mb-3">
-          <button className="btn btn-outline-danger" onClick={onLogout}>
+          
+          <button className="btn btn-outline-danger" onClick={handleLogout}>
             Cerrar sesión
           </button>
         </div>
-        {renderSection()}
+        
+       
+        <Outlet />
       </div>
     </div>
   );

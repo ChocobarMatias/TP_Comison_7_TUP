@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useLocalStorage } from "./useLocalStorage";
 import { fakeLogin } from "../../utils/authService";
 import { Form, Button, Container, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-export default function Login() {
+export default function LoginPage() {
   const navigate = useNavigate();
-  const [, setAuth] = useLocalStorage("auth", null);
+  const { login } = useAuth(); // usamos el contexto global
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,9 +14,10 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       const resp = await fakeLogin({ email, password });
-      setAuth(resp); // persiste en localStorage
+      login(resp);
       navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Error de login");
@@ -25,18 +26,35 @@ export default function Login() {
 
   return (
     <Container className="py-5" style={{ maxWidth: 500 }}>
-      <h3>Iniciar sesión (simulado)</h3>
+      <h3>Iniciar sesión</h3>
       {error && <Alert variant="danger">{error}</Alert>}
+
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Email</Form.Label>
-          <Form.Control type="email" value={email} onChange={e=>setEmail(e.target.value)} required/>
+          <Form.Control
+            type="email"
+            placeholder="admin@academy.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Contraseña</Form.Label>
-          <Form.Control type="password" value={password} onChange={e=>setPassword(e.target.value)} required/>
+          <Form.Control
+            type="password"
+            placeholder="admin123"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
         </Form.Group>
-        <Button type="submit">Ingresar</Button>
+
+        <Button type="submit" className="w-100">
+          Ingresar
+        </Button>
       </Form>
     </Container>
   );

@@ -1,16 +1,21 @@
 .sidebar-container {
+  /* 1. Define el ancho. 'flex-shrink: 0' evita que se encoja */
   width: 250px;
-  height: 100vh;
+  flex-shrink: 0; 
+  
+  /* 2. 'min-height' en lugar de 'height' para que crezca si es necesario */
+  min-height: 100vh; 
   background: linear-gradient(180deg, #ce6565, #3d85d3);
   color: #0f172a;
   padding: 25px 20px;
   border-right: 1px solid #e2e8f0;
   border-radius: 0 25px 25px 0;
-  position: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.08);
+
+
 }
 
 .sidebar-title {

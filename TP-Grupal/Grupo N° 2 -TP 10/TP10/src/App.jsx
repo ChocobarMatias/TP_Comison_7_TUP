@@ -7,7 +7,7 @@ function App() {
   const [isLogged, setIsLogged] = useState(false);
 
   useEffect(() => {
-    // Revisa si hay sesión guardada
+    
     const session = localStorage.getItem("isLogged");
     if (session === "true") setIsLogged(true);
   }, []);

@@ -1,123 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Modal, Row, Col } from 'react-bootstrap';
-import { addItem } from '../Utils/utils'; 
+import { addItem, updateItem } from '../Utils/utils';
 
-function ModalFormularioArtista({ show, handleClose, onArtistaAdded }) {
+function ModalFormularioArtista({ show, handleClose, onArtistaAdded, artistaAEditar, esEdicion }) {
     
-    const [artista, setArtista] = useState({
+    const initialState = {
         nombre: '',
         apellido: '',
         nombreArt: '',
         dni: '',
-        fechaNac: '',
-    });
+        disponible: true,
+    };
+    
+    const [artista, setArtista] = useState(initialState);
+
+    useEffect(() => {
+        if (esEdicion && artistaAEditar) {
+            // Unimos el estado inicial con el artista a editar.
+            // Esto asegura que todos los campos siempre tengan un valor definido.
+            setArtista({ ...initialState, ...artistaAEditar });
+        } else {
+            setArtista(initialState);
+        }
+    }, [artistaAEditar, esEdicion, show]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setArtista(prev => ({
             ...prev,
-            [name]: value,
+            [name]: type === 'checkbox' ? checked : value,
         }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        const nuevoArtista = { ...artista };
-
         try {
-            addItem('artistas', nuevoArtista);
-            setArtista({ nombre: '', apellido: '', nombreArt: '', dni: '', fechaNac: '' });
-            handleClose(); 
-            
-            if (onArtistaAdded) {
-                onArtistaAdded(); 
+            if (esEdicion) {
+                updateItem('artistas', artista.id, artista);
+            } else {
+                addItem('artistas', artista);
             }
-
+            onArtistaAdded();
+            handleClose(); 
         } catch (error) {
-            alert("Error al registrar el Artista. Revisa la consola.");
+            alert("Error al guardar el Artista. Revisa la consola.");
             console.error(error);
         }
     };
 
     return (
-        <Modal
-            show={show}
-            onHide={handleClose}
-            centered
-            aria-labelledby="modal-registro-artista-title"
-        >
+        <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton className="bg-primary text-white">
-                <Modal.Title id="modal-registro-artista-title">
-                    Registrar Nuevo Artista
-                </Modal.Title>
+                <Modal.Title>{esEdicion ? "Editar Artista" : "Registrar Nuevo Artista"}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
-                    
                     <Row className="mb-3">
-                        <Form.Group as={Col} controlId="formNombreArt">
+                        <Form.Group as={Col}>
                             <Form.Label>Nombre Artístico</Form.Label>
-                            <Form.Control 
-                                type="text" 
-                                placeholder="Ej: Shakira" 
-                                name="nombreArt"
-                                value={artista.nombreArt}
-                                onChange={handleChange}
-                                required
-                            />
+                            <Form.Control type="text" name="nombreArt" value={artista.nombreArt} onChange={handleChange} required />
                         </Form.Group>
-                        <Form.Group as={Col} controlId="formDNI">
+                        <Form.Group as={Col}>
                             <Form.Label>DNI</Form.Label>
-                            <Form.Control 
-                                type="text" 
-                                placeholder="Ej: 30123456" 
-                                name="dni"
-                                value={artista.dni}
-                                onChange={handleChange}
-                                required
-                            />
+                            <Form.Control type="text" name="dni" value={artista.dni} onChange={handleChange} required />
                         </Form.Group>
                     </Row>
-
                     <Row className="mb-3">
-                        <Form.Group as={Col} controlId="formNombre">
+                        <Form.Group as={Col}>
                             <Form.Label>Nombre</Form.Label>
-                            <Form.Control 
-                                type="text" 
-                                placeholder="Ej: Isabel" 
-                                name="nombre"
-                                value={artista.nombre}
-                                onChange={handleChange}
-                                required
-                            />
+                            <Form.Control type="text" name="nombre" value={artista.nombre} onChange={handleChange} required />
                         </Form.Group>
-                        <Form.Group as={Col} controlId="formApellido">
+                        <Form.Group as={Col}>
                             <Form.Label>Apellido</Form.Label>
-                            <Form.Control 
-                                type="text" 
-                                placeholder="Ej: Mebarak" 
-                                name="apellido"
-                                value={artista.apellido}
-                                onChange={handleChange}
-                                required
-                            />
+                            <Form.Control type="text" name="apellido" value={artista.apellido} onChange={handleChange} required />
                         </Form.Group>
                     </Row>
-
-                    <Form.Group className="mb-3" controlId="formFechaNac">
-                        <Form.Label>Fecha de Nacimiento</Form.Label>
-                        <Form.Control 
-                            type="date"
-                            name="fechaNac"
-                            value={artista.fechaNac}
-                            onChange={handleChange}
-                            required
-                        />
-                    </Form.Group>
+                    
+                    {esEdicion && (
+                        <Form.Group className="mb-3 mt-3">
+                            <Form.Check 
+                                type="switch"
+                                id="disponibilidad-switch"
+                                label="Disponible para eventos"
+                                name="disponible"
+                                checked={artista.disponible}
+                                onChange={handleChange}
+                            />
+                        </Form.Group>
+                    )}
 
                     <Button variant="primary" type="submit" className="w-100 mt-3">
-                        REGISTRAR ARTISTA
+                        {esEdicion ? "GUARDAR CAMBIOS" : "REGISTRAR ARTISTA"}
                     </Button>
                 </Form>
             </Modal.Body>

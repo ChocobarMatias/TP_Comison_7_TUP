@@ -4,7 +4,7 @@ import Login from "../Components/FormLogin";
 import NavBar from "../Components/navBar";
 function IniciarSesion() {
     return(
-         <div
+        <div
       style={{
         height: "100vh",
         width: "100vw",

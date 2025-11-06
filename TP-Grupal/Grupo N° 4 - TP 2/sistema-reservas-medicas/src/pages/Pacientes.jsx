@@ -1,147 +1,89 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Form, Button, Badge, InputGroup, Alert } from 'react-bootstrap';
-import Modal from '../components/Modal';
-import { generateId } from '../utils/helpers';
+import React, { useState } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  Form,
+  Button,
+  Badge,
+  InputGroup,
+  Alert,
+  Spinner,
+} from "react-bootstrap";
+import { usePatients } from "../hooks/usePatients";
+import PatientFormModal from "../components/PatientFormModal";
 
 const Pacientes = () => {
-  const [pacientes, setPacientes] = useState([]);
-  const [pacientesFiltrados, setPacientesFiltrados] = useState([]);
-  const [filtros, setFiltros] = useState({
-    busqueda: '',
-    edad: ''
-  });
+  const {
+    patients,
+    isLoading,
+    error,
+    deletePatient,
+    searchPatients,
+    fetchPatients,
+    createPatient,
+    updatePatient,
+  } = usePatients();
+  const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('nuevo');
-  const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
-  useEffect(() => {
-    // Datos simulados de pacientes
-    const datosSimulados = [
-      {
-        id: 1,
-        nombre: 'Juan Pérez',
-        apellido: 'García',
-        dni: '12345678',
-        fechaNacimiento: '1985-03-15',
-        telefono: '123-456-7890',
-        email: 'juan.perez@email.com',
-        direccion: 'Av. Principal 123',
-        ciudad: 'Buenos Aires',
-        obraSocial: 'OSDE',
-        numeroAfiliado: '123456789',
-        fechaRegistro: '2024-01-15',
-        activo: true
-      },
-      {
-        id: 2,
-        nombre: 'María',
-        apellido: 'López',
-        dni: '87654321',
-        fechaNacimiento: '1990-07-22',
-        telefono: '098-765-4321',
-        email: 'maria.lopez@email.com',
-        direccion: 'Calle Secundaria 456',
-        ciudad: 'Córdoba',
-        obraSocial: 'Swiss Medical',
-        numeroAfiliado: '987654321',
-        fechaRegistro: '2024-02-10',
-        activo: true
-      },
-      {
-        id: 3,
-        nombre: 'Carlos',
-        apellido: 'Ruiz',
-        dni: '11223344',
-        fechaNacimiento: '1978-11-08',
-        telefono: '555-123-4567',
-        email: 'carlos.ruiz@email.com',
-        direccion: 'Plaza Central 789',
-        ciudad: 'Rosario',
-        obraSocial: 'Galeno',
-        numeroAfiliado: '112233445',
-        fechaRegistro: '2024-03-05',
-        activo: false
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    searchPatients(value);
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    fetchPatients();
+  };
+
+  const handleDeletePatient = async (id) => {
+    if (window.confirm("¿Está seguro de que desea eliminar este paciente?")) {
+      const result = await deletePatient(id);
+      if (result.success) {
+        alert("Paciente eliminado exitosamente");
+      } else {
+        alert(`Error: ${result.error}`);
       }
-    ];
-    setPacientes(datosSimulados);
-    setPacientesFiltrados(datosSimulados);
-  }, []);
-
-  useEffect(() => {
-    // Aplicar filtros
-    let filtrados = pacientes;
-
-    if (filtros.busqueda) {
-      const busqueda = filtros.busqueda.toLowerCase();
-      filtrados = filtrados.filter(paciente => 
-        paciente.nombre.toLowerCase().includes(busqueda) ||
-        paciente.apellido.toLowerCase().includes(busqueda) ||
-        paciente.dni.includes(busqueda) ||
-        paciente.email.toLowerCase().includes(busqueda)
-      );
     }
-
-    if (filtros.edad) {
-      const edadMinima = parseInt(filtros.edad);
-      const hoy = new Date();
-      filtrados = filtrados.filter(paciente => {
-        const fechaNac = new Date(paciente.fechaNacimiento);
-        const edad = hoy.getFullYear() - fechaNac.getFullYear();
-        return edad >= edadMinima;
-      });
-    }
-
-    setPacientesFiltrados(filtrados);
-  }, [pacientes, filtros]);
-
-  const handleFiltroChange = (campo, valor) => {
-    setFiltros(prev => ({
-      ...prev,
-      [campo]: valor
-    }));
   };
 
-  const limpiarFiltros = () => {
-    setFiltros({
-      busqueda: '',
-      edad: ''
-    });
-  };
-
-  const handleNuevoPaciente = () => {
-    setModalType('nuevo');
-    setPacienteSeleccionado(null);
+  const handleNewPatient = () => {
+    setSelectedPatient(null);
     setShowModal(true);
   };
 
-  const handleEditarPaciente = (id) => {
-    const paciente = pacientes.find(p => p.id === id);
-    if (paciente) {
-      setModalType('editar');
-      setPacienteSeleccionado(paciente);
-      setShowModal(true);
-    }
+  const handleEditPatient = (patient) => {
+    setSelectedPatient(patient);
+    setShowModal(true);
   };
 
-  const handleSavePaciente = (pacienteData) => {
-    if (modalType === 'nuevo') {
-      setPacientes(prev => [...prev, pacienteData]);
+  const handleSavePatient = async (patientData) => {
+    let result;
+
+    if (selectedPatient) {
+      result = await updatePatient(selectedPatient.id, patientData);
     } else {
-      setPacientes(prev => prev.map(p => p.id === pacienteData.id ? pacienteData : p));
+      result = await createPatient(patientData);
     }
-    setShowModal(false);
-    setPacienteSeleccionado(null);
+
+    if (result.success) {
+      alert(result.message || "Operación exitosa");
+      setSelectedPatient(null);
+    } else {
+      alert(`Error: ${result.error}`);
+    }
+
+    return result;
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setPacienteSeleccionado(null);
-  };
-
-  const handleEliminarPaciente = (id) => {
-    if (window.confirm('¿Está seguro de que desea eliminar este paciente?')) {
-      setPacientes(prev => prev.filter(p => p.id !== id));
-    }
+    setSelectedPatient(null);
   };
 
   const calcularEdad = (fechaNacimiento) => {
@@ -155,61 +97,57 @@ const Pacientes = () => {
     return edad;
   };
 
-  const getStatusBadge = (activo) => {
-    return activo ? 
-      <Badge bg="success">Activo</Badge> : 
-      <Badge bg="secondary">Inactivo</Badge>;
-  };
+  if (isLoading) {
+    return (
+      <Container className="mt-4">
+        <div className="text-center py-5">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-2">Cargando pacientes...</p>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container className="mt-4">
-      {/* Filtros */}
+      <Row className="mb-4">
+        <Col>
+          <h2>Gestión de Pacientes</h2>
+        </Col>
+      </Row>
+
+      {error && (
+        <Alert variant="danger" dismissible>
+          {error}
+        </Alert>
+      )}
+
       <Row className="mb-4">
         <Col>
           <Card>
-            <Card.Header>
-              <h5>Filtros y Búsqueda</h5>
-            </Card.Header>
             <Card.Body>
               <Row>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Búsqueda</Form.Label>
-                    <InputGroup>
-                      <Form.Control
-                        type="text"
-                        placeholder="Buscar por nombre, apellido, DNI o email..."
-                        value={filtros.busqueda}
-                        onChange={(e) => handleFiltroChange('busqueda', e.target.value)}
-                      />
-                      <Button 
-                        variant="outline-secondary" 
-                        onClick={limpiarFiltros}
-                      >
-                        Limpiar
-                      </Button>
-                    </InputGroup>
-                  </Form.Group>
-                </Col>
-                <Col md={3}>
-                  <Form.Group>
-                    <Form.Label>Edad mínima</Form.Label>
+                <Col md={10}>
+                  <Form.Label>Buscar paciente</Form.Label>
+                  <InputGroup>
                     <Form.Control
-                      type="number"
-                      placeholder="Ej: 18"
-                      value={filtros.edad}
-                      onChange={(e) => handleFiltroChange('edad', e.target.value)}
-                      min="0"
-                      max="120"
+                      type="text"
+                      placeholder="Buscar por nombre, apellido, DNI o email..."
+                      value={searchTerm}
+                      onChange={handleSearch}
                     />
-                  </Form.Group>
+                    <Button
+                      variant="outline-secondary"
+                      onClick={handleClearSearch}
+                    >
+                      Limpiar
+                    </Button>
+                  </InputGroup>
                 </Col>
-                <Col md={3} className="d-flex align-items-end">
-                  <div>
-                    <small className="text-muted">
-                      Total: {pacientesFiltrados.length} pacientes
-                    </small>
-                  </div>
+                <Col md={2} className="d-flex align-items-end">
+                  <Badge bg="info" className="w-100 text-center py-2">
+                    Total: {patients.length}
+                  </Badge>
                 </Col>
               </Row>
             </Card.Body>
@@ -217,81 +155,68 @@ const Pacientes = () => {
         </Col>
       </Row>
 
-      {/* Tabla de Pacientes */}
       <Row>
         <Col>
           <Card>
             <Card.Header className="d-flex justify-content-between align-items-center">
-              <h5>Pacientes ({pacientesFiltrados.length})</h5>
-              <Button variant="primary" size="sm" onClick={handleNuevoPaciente}>
+              <h5 className="mb-0">Lista de Pacientes ({patients.length})</h5>
+              <Button variant="primary" onClick={handleNewPatient}>
                 + Nuevo Paciente
               </Button>
             </Card.Header>
             <Card.Body>
-              {pacientesFiltrados.length === 0 ? (
-                <Alert variant="info">
-                  No se encontraron pacientes con los filtros aplicados.
-                </Alert>
+              {patients.length === 0 ? (
+                <Alert variant="info">No se encontraron pacientes.</Alert>
               ) : (
                 <div className="table-responsive">
                   <Table striped bordered hover>
                     <thead>
                       <tr>
-                        <th>ID</th>
                         <th>Nombre Completo</th>
                         <th>DNI</th>
+                        <th>Fecha Nac.</th>
                         <th>Edad</th>
-                        <th>Contacto</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
                         <th>Obra Social</th>
-                        <th>Estado</th>
                         <th>Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {pacientesFiltrados.map(paciente => (
-                        <tr key={paciente.id}>
-                          <td>{paciente.id}</td>
+                      {patients.map((patient) => (
+                        <tr key={patient.id}>
                           <td>
-                            <div>
-                              <strong>{paciente.nombre} {paciente.apellido}</strong>
-                              <br />
-                              <small className="text-muted">
-                                Registrado: {new Date(paciente.fechaRegistro).toLocaleDateString('es-AR')}
-                              </small>
-                            </div>
+                            <strong>
+                              {patient.nombre} {patient.apellido}
+                            </strong>
                           </td>
-                          <td>{paciente.dni}</td>
-                          <td>{calcularEdad(paciente.fechaNacimiento)} años</td>
+                          <td>{patient.dni}</td>
                           <td>
-                            <div>
-                              <small>{paciente.telefono}</small>
-                              <br />
-                              <small className="text-muted">{paciente.email}</small>
-                            </div>
+                            {new Date(
+                              patient.fechaNacimiento
+                            ).toLocaleDateString("es-AR")}
+                          </td>
+                          <td>{calcularEdad(patient.fechaNacimiento)} años</td>
+                          <td>{patient.telefono}</td>
+                          <td>{patient.email}</td>
+                          <td>
+                            <Badge bg="info">{patient.obraSocial}</Badge>
                           </td>
                           <td>
-                            <div>
-                              <small>{paciente.obraSocial}</small>
-                              <br />
-                              <small className="text-muted">#{paciente.numeroAfiliado}</small>
-                            </div>
-                          </td>
-                          <td>{getStatusBadge(paciente.activo)}</td>
-                          <td>
-                            <div className="d-flex gap-1">
-                              <Button 
-                                variant="outline-primary" 
+                            <div className="d-flex gap-2">
+                              <Button
+                                variant="outline-primary"
                                 size="sm"
-                                onClick={() => handleEditarPaciente(paciente.id)}
+                                onClick={() => handleEditPatient(patient)}
                               >
-                                ✏️
+                                Editar
                               </Button>
-                              <Button 
-                                variant="outline-danger" 
+                              <Button
+                                variant="outline-danger"
                                 size="sm"
-                                onClick={() => handleEliminarPaciente(paciente.id)}
+                                onClick={() => handleDeletePatient(patient.id)}
                               >
-                                🗑️
+                                Eliminar
                               </Button>
                             </div>
                           </td>
@@ -306,38 +231,13 @@ const Pacientes = () => {
         </Col>
       </Row>
 
-      {/* Modal para Nuevo/Editar Paciente */}
-      <Modal
+      <PatientFormModal
         show={showModal}
         onHide={handleCloseModal}
-        title={modalType === 'nuevo' ? 'Nuevo Paciente' : 'Editar Paciente'}
-        onSave={() => {}} // Se maneja en el formulario
-        onCancel={handleCloseModal}
-        saveText="Guardar"
-        cancelText="Cancelar"
-        size="lg"
-      >
-        <PacienteForm
-          paciente={pacienteSeleccionado}
-          onSave={handleSavePaciente}
-          onCancel={handleCloseModal}
-        />
-      </Modal>
+        onSave={handleSavePatient}
+        patient={selectedPatient}
+      />
     </Container>
-  );
-};
-
-// Componente de formulario para pacientes (se implementará después)
-const PacienteForm = ({ paciente, onSave, onCancel }) => {
-  return (
-    <div className="text-center p-4">
-      <h5>Formulario de Paciente</h5>
-      <p>Formulario completo por implementar en la próxima iteración</p>
-      <p>Paciente: {paciente ? `${paciente.nombre} ${paciente.apellido}` : 'Nuevo'}</p>
-      <Button variant="secondary" onClick={onCancel}>
-        Cerrar
-      </Button>
-    </div>
   );
 };
 

@@ -18,9 +18,9 @@ function DashboardComponent() {
     }
 
     const menu = [
-        { id: 1, title: "GESTIÓN EVENTOS", path: '/dashboard/eventos' },
-        { id: 2, title: "GESTIÓN ARTISTAS", path: '/dashboard/artistas' },
-        { id: 3, title: "GESTIÓN ASISTENTES", path: '/dashboard/asistentes' }
+        { id: 1, title: "EVENTOS", path: '/dashboard/eventos' },
+        { id: 2, title: "ARTISTAS", path: '/dashboard/artistas' },
+        { id: 3, title: "ASISTENTES", path: '/dashboard/asistentes' }
     ];
 
     return (
@@ -43,7 +43,7 @@ function DashboardComponent() {
                         borderBottom: '2px solid #34495e',
                         paddingBottom: '15px'
                     }}>
-                        DASHBOARD
+                        Gestión
                     </h2>
                     
                     <div>

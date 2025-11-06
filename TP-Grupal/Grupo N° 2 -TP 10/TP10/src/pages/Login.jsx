@@ -1,18 +1,20 @@
 import { useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
+import { useNavigate } from 'react-router-dom'; 
 import "../styles/login.css";
 import logo from "../assets/barb.png";
 
 
-export default function Login({ onLogin }) {
+export default function Login() {
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate(); 
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Credenciales simuladas
+  
     const validUser = "admin";
     const validPass = "1234";
 
@@ -21,13 +23,16 @@ export default function Login({ onLogin }) {
       return;
     }
 
-    if (user === validUser && pass === validPass) {
-      localStorage.setItem("isLogged", "true");
-      onLogin();
-    } else {
-      setError("❌ Usuario o contraseña incorrectos");
-    }
-  };
+ if (user === validUser && pass === validPass) {
+      
+localStorage.setItem("isLogged", "true"); 
+      
+     
+ navigate('/app/dashboard', { replace: true });
+ } else {
+ setError("❌ Usuario o contraseña incorrectos");
+ }
+ };
 
   return (
     <div className="login-container">
