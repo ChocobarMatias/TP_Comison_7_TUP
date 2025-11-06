@@ -1,6 +1,6 @@
 .socios-page {
   padding: 32px;
-  background-color: #f5f5f5;
+  background-color: #9e989869;
   min-height: 100vh;
 }
 
@@ -10,6 +10,9 @@
   gap: 24px;
   max-width: 1600px;
   margin: 0 auto;
+  background-color: #9e989869;
+  padding: 24px;
+  border-radius: 8px;
 }
 
 /* Responsive */
