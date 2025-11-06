@@ -34,7 +34,6 @@ const Deportes = () => {
 
   return (
     <div className="deportes-page">
-      {/* Header del componente */}
       <div className="deportes-header">
         <h1 className="page-title">Gestión de Deportes</h1>
         <Button
@@ -47,7 +46,6 @@ const Deportes = () => {
         </Button>
       </div>
 
-      {/* Cards de estadísticas */}
       <div className="stats-cards">
         <div className="stat-card">
           <div className="stat-label">Total de Deportes</div>
@@ -63,7 +61,6 @@ const Deportes = () => {
         </div>
       </div>
 
-      {/* Tabla de deportes */}
       <SportsTable ref={sportsTableRef} />
     </div>
   );

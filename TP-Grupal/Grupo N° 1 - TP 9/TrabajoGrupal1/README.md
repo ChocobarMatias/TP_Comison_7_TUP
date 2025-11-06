@@ -244,8 +244,9 @@ git push origin dev
  * Archivo apiService.js dentro de la carpeta service
  * useFetch.js dentro de la carpeta hooks
  * archivo db.json
+ * Se cambio el estilo de la pagina Deporte
 
 # Errores 
-Hay un error al entrar a la seccion de pagos, despues de unos segundos la seccion pagos deja de funcionar y salta un error.
+No detectamos errores, lo unico que podemos destacar es que cuando se agrega un nuevo miembro, la foto de perfil es aleatoria
 
 
