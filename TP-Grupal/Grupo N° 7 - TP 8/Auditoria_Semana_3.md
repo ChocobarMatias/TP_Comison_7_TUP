@@ -1,10 +1,10 @@
 # 🧾 Auditoría — Semana 3  
-### Grupo Nº: ___  
-### Tema asignado: ___  
+### Grupo Nº: 7  
+### Tema asignado: TP 8 – Sistema de Gestión de Donaciones para ONG 
 ### Integrantes (Nombre completo + Legajo):
-- …
-- …
-- …
+- Lautaro Punta - 61302
+- Facundo DiBerto - 61331
+- Lautaro DiBerto - 61464
 
 ---
 
