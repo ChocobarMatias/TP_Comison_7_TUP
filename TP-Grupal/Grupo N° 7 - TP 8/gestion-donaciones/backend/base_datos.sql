@@ -60,7 +60,7 @@ CREATE TABLE entregas (
 
 INSERT INTO usuarios (username, password_hash, nombre_completo, rol)
 VALUES
-  ('admin', '$2a$10$XHITVEWil/92pT9bkOuMweeHbdD.N14r2raXIiQunlslqY5T2rY0K', 'Administrador General', 'admin');
+  ('admin', '$2a$10$0A3nU2cXOCiVP6DRoPUy4u6WNRwZoK3KrLQSRgmdRCaDh8un3OWTa', 'Administrador General', 'admin');
 
 INSERT INTO donantes (nombre, email, monto, activo) VALUES
   ('Laura Pérez', 'laura@gmail.com', 5000, 1),
