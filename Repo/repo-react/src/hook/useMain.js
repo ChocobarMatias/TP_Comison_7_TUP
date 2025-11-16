@@ -1,0 +1,1 @@
+//intersecto todo lo que necesito para el hook principallos datos del service y los estados

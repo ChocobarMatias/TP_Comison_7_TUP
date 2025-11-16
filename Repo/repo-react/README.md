@@ -65,5 +65,32 @@ npm i bootstrap-icons
 npm i sweetalert2-react-content   (esto es para usar modales de sweetalert2 en react)
 
 
-react-router-dom
+react -router-dom: es una biblioteca que permite la navegacion y el enrutamiento en aplicaciones React de una sola pagina (SPA). Facilita la creacion de rutas y la gestion de la navegacion entre diferentes componentes o vistas dentro de la aplicacion.
+
+comando para instalar react-router-dom:
 npm install react-router-dom
+
+esta compuesto por la estiquitas de componente:
+--------------------------------------------
+BrowserRouter: es un componente que utiliza la API de historial del navegador para mantener la interfaz de
+Routes: es un contenedor para definir las rutas de la aplicacion. Dentro de Routes, se definen multiples Route.
+Route: es un componente que define una ruta especifica en la aplicacion. Cada Route tiene dos propiedades principales: path y element. La propiedad path especifica la URL que activa la ruta, y la propiedad element define el componente que se renderiza cuando la ruta coincide con la URL actual.
+--------------------------------------------
+json-server: es una herramienta que permite crear una API RESTful falsa utilizando un archivo JSON como base de datos. Es util para el desarrollo y las pruebas de aplicaciones frontend sin necesidad de configurar un backend real.
+
+
+
+comando para instalar json-server:  usaremos como API Fake para pruebas
+npm install -g json-server
+
+npm install json-server --save-dev (esto instala json-server como dependencia de desarrollo en tu proyecto)
+
+Variables de entorno en Vite:
+Vite utiliza archivos .env para manejar variables de entorno. Puedes crear un archivo .env en la raiz de tu proyecto y definir variables de entorno con el prefijo VITE_. Por ejemplo:
+VITE_API_URL=https://api.ejemplo.com
+
+tenemos un Hook de reat-router-dom
+
+useNavigate: es un hook proporcionado por react-router-dom que permite la navegacion programatica entre rutas en una aplicacion React. Con useNavigate, puedes redirigir a los usuarios a diferentes paginas o componentes sin necesidad de utilizar enlaces o botones de navegacion tradicionales.
+
+useParams: es un hook proporcionado por react-router-dom que permite acceder a los parametros de la URL en una aplicacion React. Con useParams, puedes obtener los valores de los parametros definidos en las rutas dinamicas, lo que facilita la extraccion de informacion directamente desde la URL para su uso en componentes.

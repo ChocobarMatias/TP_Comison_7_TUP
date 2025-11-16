@@ -1,0 +1,30 @@
+.boton {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 112px;
+}
+.boton:hover {
+  background-color: #45a049;
+}
+
+.contenedorIMG {
+  display: flex; /*esto centra la imagen */
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+.imagen {
+  width: 200px;
+  height: 230px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
