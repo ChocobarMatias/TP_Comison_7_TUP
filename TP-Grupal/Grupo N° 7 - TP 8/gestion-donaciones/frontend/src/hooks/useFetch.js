@@ -1,35 +1,25 @@
 import { useState, useEffect, useCallback } from "react";
+import { httpRequest } from "../services/httpClient";
 
-export function useFetch(url, options = {}) {
+export function useFetch(endpoint, { skip = false } = {}) {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!skip);
   const [error, setError] = useState(null);
 
   const fetchData = useCallback(async () => {
+    if (skip) return;
+
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
+      const result = await httpRequest(endpoint);
       setData(result);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [url]);
+  }, [endpoint, skip]);
 
   useEffect(() => {
     fetchData();

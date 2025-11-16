@@ -1,35 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const FormularioEntrega = ({ onAgregarEntrega, isSubmitting = false }) => {
-  const [contenido, setContenido] = useState('');
-  const [destino, setDestino] = useState('');
-  const [fechaSalida, setFechaSalida] = useState('');
+  const [contenido, setContenido] = useState("");
+  const [destino, setDestino] = useState("");
+  const [fechaSalida, setFechaSalida] = useState("");
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // Evita que la página se recargue
+    e.preventDefault();
 
     if (!contenido || !destino || !fechaSalida) {
-      alert('Por favor, completa todos los campos.');
+      alert("Por favor, completa todos los campos obligatorios.");
       return;
     }
 
-    // Creamos el nuevo objeto de entrega
     const nuevaEntrega = {
-      id: `D${Math.floor(Math.random() * 1000)}`, // Un ID simple y aleatorio
       contenido,
       destino,
       fechaSalida,
-      fechaLlegada: 'Calculada...', // Podrías calcular esto dinámicamente
-      estadoInicial: 'pendiente'
+      estado: "pendiente",
     };
 
-    // Llamamos a la función del componente padre para agregar la entrega
     onAgregarEntrega(nuevaEntrega);
 
-    // Limpiamos el formulario
-    setContenido('');
-    setDestino('');
-    setFechaSalida('');
+    setContenido("");
+    setDestino("");
+    setFechaSalida("");
   };
 
   return (
@@ -40,7 +35,9 @@ const FormularioEntrega = ({ onAgregarEntrega, isSubmitting = false }) => {
       <div className="card-body">
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label htmlFor="contenido" className="form-label">Contenido de la Donación</label>
+            <label htmlFor="contenido" className="form-label">
+              Contenido de la Donación
+            </label>
             <input
               type="text"
               className="form-control"
@@ -50,7 +47,9 @@ const FormularioEntrega = ({ onAgregarEntrega, isSubmitting = false }) => {
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="destino" className="form-label">Destino</label>
+            <label htmlFor="destino" className="form-label">
+              Destino
+            </label>
             <input
               type="text"
               className="form-control"
@@ -60,7 +59,9 @@ const FormularioEntrega = ({ onAgregarEntrega, isSubmitting = false }) => {
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="fechaSalida" className="form-label">Fecha de Salida</label>
+            <label htmlFor="fechaSalida" className="form-label">
+              Fecha de Salida
+            </label>
             <input
               type="date"
               className="form-control"

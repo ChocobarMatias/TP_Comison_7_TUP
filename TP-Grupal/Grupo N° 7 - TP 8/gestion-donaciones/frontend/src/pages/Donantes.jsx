@@ -1,8 +1,9 @@
 import { Table, Badge, Spinner, Alert } from "react-bootstrap";
 import { useFetch } from "../hooks/useFetch";
+import { ENDPOINTS } from "../utils/constants/endpoints";
 
 export default function Donantes() {
-  const { data: donantes, loading, error } = useFetch("http://localhost:3001/donantes");
+  const { data: donantes, loading, error } = useFetch(ENDPOINTS.DONANTES);
 
   if (loading) {
     return (

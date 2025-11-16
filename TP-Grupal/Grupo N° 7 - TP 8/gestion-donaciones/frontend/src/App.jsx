@@ -1,10 +1,10 @@
 import { Container, Navbar } from "react-bootstrap";
 import { Outlet } from "react-router-dom";
-import './Styles/Styles.css';
-
+import "./Styles/Styles.css";
+import { useUserStore, selectUser } from "./store/userStore";
 
 export default function App() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = useUserStore(selectUser);
 
   return (
     <>
@@ -13,11 +13,9 @@ export default function App() {
           <Navbar.Brand href="/">Gestión de Donaciones</Navbar.Brand>
           {user && (
             <Navbar.Text className="text-light">
-              Bienvenido, <strong>{user.name}</strong>
+              Bienvenido, <strong>{user.nombre}</strong>
             </Navbar.Text>
-            
           )}
-        
         </Container>
       </Navbar>
 

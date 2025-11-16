@@ -1,9 +1,10 @@
 import { Card, Row, Col, Badge, Spinner, Alert } from "react-bootstrap";
 import { FaDonate, FaClock, FaCheckCircle } from "react-icons/fa";
 import { useFetch } from "../hooks/useFetch";
+import { ENDPOINTS } from "../utils/constants/endpoints";
 
 export default function SeccionDonaciones() {
-  const { data: donaciones, loading, error } = useFetch("http://localhost:3001/donaciones");
+  const { data: donaciones, loading, error } = useFetch(ENDPOINTS.DONACIONES);
 
   const getBgColor = (estado) => {
     if (estado === "Completada") return "bg-success text-white";

@@ -6,6 +6,14 @@
 npm install
 ```
 
+## Configuración
+
+```bash
+cp env.example .env
+```
+
+Define `VITE_API_URL` (por defecto `http://localhost:3001/api`).
+
 ## Desarrollo
 
 ```bash
@@ -25,5 +33,5 @@ npm run build
 
 ## Nota
 
-Asegúrate de que el backend esté corriendo en `http://localhost:3001` antes de usar la aplicación.
+Asegúrate de que el backend real (Express + MySQL) esté corriendo y accesible en la URL definida por `VITE_API_URL` antes de usar la aplicación. El estado de sesión se gestiona con Zustand, sin uso de `localStorage`.
 

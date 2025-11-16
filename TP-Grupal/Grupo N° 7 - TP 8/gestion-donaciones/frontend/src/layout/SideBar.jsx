@@ -1,11 +1,14 @@
 import { Nav, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { useUserStore, selectUser } from "../store/userStore";
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const user = useUserStore(selectUser);
+  const clearSession = useUserStore((state) => state.clearSession);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    clearSession();
     navigate("/", { replace: true });
   };
 
@@ -19,7 +22,6 @@ export default function Sidebar() {
         color: "#fff",
       }}
     >
-      {/* Parte superior: navegación */}
       <div>
         <h4 className="mb-4 text-center fw-bold text-white">GESTIÓN</h4>
         <Nav className="flex-column">
@@ -50,7 +52,6 @@ export default function Sidebar() {
         </Nav>
       </div>
 
-      {/* Parte inferior: cerrar sesión */}
       <div className="text-center mt-auto">
         <Button
           variant="light"
@@ -63,7 +64,7 @@ export default function Sidebar() {
           Cerrar sesión
         </Button>
         <p className="text-white-50 small mb-0">
-          Sesión iniciada como: <strong>{JSON.parse(localStorage.getItem("user"))?.name}</strong>
+          Sesión iniciada como: <strong>{user?.nombre ?? "Usuario"}</strong>
         </p>
       </div>
     </div>
