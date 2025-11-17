@@ -1,33 +1,30 @@
 import db from "../config/db.js";
 
-export const getAllLibros = async () => {
+export async function getAllLibros() {
   const [rows] = await db.promise().query("SELECT * FROM libros");
   return rows;
-};
+}
 
-export const getLibroById = async (id) => {
-  const [rows] = await db.promise().query(
-    "SELECT * FROM libros WHERE id = ?",
-    [id]
-  );
+export async function getLibroById(id) {
+  const [rows] = await db.promise().query("SELECT * FROM libros WHERE id = ?", [id]);
   return rows[0];
-};
+}
 
-export const createLibro = async (titulo, autor, año, stock) => {
+export async function createLibro(titulo, autor, categoria, cantidad, cantidadDisponible) {
   const [result] = await db.promise().query(
-    "INSERT INTO libros (titulo, autor, año, stock) VALUES (?, ?, ?, ?)",
-    [titulo, autor, año, stock]
+    "INSERT INTO libros (titulo, autor, categoria, cantidad, cantidadDisponible) VALUES (?, ?, ?, ?, ?)",
+    [titulo, autor, categoria, cantidad, cantidadDisponible]
   );
   return result.insertId;
-};
+}
 
-export const updateLibro = async (id, titulo, autor, año, stock) => {
+export async function updateLibro(id, titulo, autor, categoria, cantidad, cantidadDisponible) {
   await db.promise().query(
-    "UPDATE libros SET titulo = ?, autor = ?, año = ?, stock = ? WHERE id = ?",
-    [titulo, autor, año, stock, id]
+    "UPDATE libros SET titulo=?, autor=?, categoria=?, cantidad=?, cantidadDisponible=? WHERE id=?",
+    [titulo, autor, categoria, cantidad, cantidadDisponible, id]
   );
-};
+}
 
-export const deleteLibro = async (id) => {
-  await db.promise().query("DELETE FROM libros WHERE id = ?", [id]);
-};
+export async function deleteLibro(id) {
+  await db.promise().query("DELETE FROM libros WHERE id=?", [id]);
+}

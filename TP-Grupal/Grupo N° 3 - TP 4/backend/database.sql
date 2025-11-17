@@ -1,52 +1,63 @@
--- Crear base de datos
-CREATE DATABASE IF NOT EXISTS biblioteca;
+-- ==============================================
+--   BASE DE DATOS DEL SISTEMA BIBLIOTECARIO
+-- ==============================================
+CREATE DATABASE biblioteca;
 USE biblioteca;
 
--- Tabla usuarios
+-- ==============================================
+--                   TABLA USUARIOS
+-- ==============================================
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(100) NOT NULL,
-    rol ENUM('admin', 'user') NOT NULL DEFAULT 'user'
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    rol VARCHAR(30) DEFAULT 'user'
 );
 
--- Tabla libros
-CREATE TABLE libros (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    autor VARCHAR(255),
-    año INT,
-    stock INT DEFAULT 0
-);
-
--- Tabla alumnos
+-- ==============================================
+--                   TABLA ALUMNOS
+-- ==============================================
 CREATE TABLE alumnos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    curso VARCHAR(50),
-    dni VARCHAR(20) UNIQUE
+    apellido VARCHAR(100) NOT NULL,
+    dni VARCHAR(20) NOT NULL,
+    email VARCHAR(150),
+    telefono VARCHAR(50),
+    CONSTRAINT uc_dni UNIQUE (dni)
+);
+--                   TABLA LIBROS
+-- ==============================================
+CREATE TABLE libros (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    autor VARCHAR(255) NOT NULL,
+    categoria VARCHAR(150),
+    cantidad INT DEFAULT 0,
+    cantidadDisponible INT DEFAULT 0
 );
 
--- Tabla prestamos
+-- ==============================================
+--                   TABLA PRESTAMOS
+-- ==============================================
 CREATE TABLE prestamos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    libro_id INT,
-    alumno_id INT,
-    fecha_prestamo DATE,
-    fecha_devolucion DATE,
-    FOREIGN KEY (libro_id) REFERENCES libros(id) ON DELETE CASCADE,
-    FOREIGN KEY (alumno_id) REFERENCES alumnos(id) ON DELETE CASCADE
+    libroId INT NOT NULL,
+    alumnoId INT NOT NULL,
+    fechaPrestamo DATE NOT NULL,
+    fechaDevolucion DATE NOT NULL,
+    
+    FOREIGN KEY (libroId) REFERENCES libros(id) ON DELETE CASCADE,
+    FOREIGN KEY (alumnoId) REFERENCES alumnos(id) ON DELETE CASCADE
 );
-
--- Tabla auditoría
-CREATE TABLE audit (
+-- ==============================================
+--                   TABLA AUDITORIA
+-- ==============================================
+CREATE TABLE auditoria (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    accion VARCHAR(255),
-    usuario VARCHAR(100),
+    accion VARCHAR(255) NOT NULL,
+    usuario VARCHAR(150),
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insertar administrador de prueba
-INSERT INTO usuarios (nombre, email, password, rol)
-VALUES ('Administrador', 'admin@escuela.edu', '1234', 'admin');

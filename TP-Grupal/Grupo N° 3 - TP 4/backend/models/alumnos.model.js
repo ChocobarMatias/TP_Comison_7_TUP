@@ -1,34 +1,30 @@
 import db from "../config/db.js";
 
-
-export const getAllAlumnos = async () => {
+export async function getAllAlumnos() {
   const [rows] = await db.promise().query("SELECT * FROM alumnos");
   return rows;
-};
+}
 
-export const getAlumnoById = async (id) => {
-  const [rows] = await db.promise().query(
-    "SELECT * FROM alumnos WHERE id = ?",
-    [id]
-  );
+export async function getAlumnoById(id) {
+  const [rows] = await db.promise().query("SELECT * FROM alumnos WHERE id = ?", [id]);
   return rows[0];
-};
+}
 
-export const createAlumno = async (nombre, curso, dni) => {
+export async function createAlumno(nombre, apellido, dni, email, telefono) {
   const [result] = await db.promise().query(
-    "INSERT INTO alumnos (nombre, curso, dni) VALUES (?, ?, ?)",
-    [nombre, curso, dni]
+    "INSERT INTO alumnos (nombre, apellido, dni, email, telefono) VALUES (?, ?, ?, ?, ?)",
+    [nombre, apellido, dni, email, telefono]
   );
   return result.insertId;
-};
+}
 
-export const updateAlumno = async (id, nombre, curso, dni) => {
+export async function updateAlumno(id, nombre, apellido, dni, email, telefono) {
   await db.promise().query(
-    "UPDATE alumnos SET nombre=?, curso=?, dni=? WHERE id=?",
-    [nombre, curso, dni, id]
+    "UPDATE alumnos SET nombre=?, apellido=?, dni=?, email=?, telefono=? WHERE id=?",
+    [nombre, apellido, dni, email, telefono, id]
   );
-};
+}
 
-export const deleteAlumno = async (id) => {
-  await db.promise().query("DELETE FROM alumnos WHERE id=?", [id]);
-};
+export async function deleteAlumno(id) {
+  await db.promise().query("DELETE FROM alumnos WHERE id = ?", [id]);
+}

@@ -1,23 +1,25 @@
 import db from "../config/db.js";
 
-export const getAllPrestamos = async () => {
-  const [rows] = await db.promise().query(
-    `SELECT prestamos.*, libros.titulo AS libro, alumnos.nombre AS alumno
-     FROM prestamos
-     JOIN libros ON prestamos.libro_id = libros.id
-     JOIN alumnos ON prestamos.alumno_id = alumnos.id`
-  );
+export async function getAllPrestamos() {
+  const [rows] = await db.promise().query(`
+    SELECT p.*, 
+           l.titulo AS libro, 
+           a.nombre AS alumno
+    FROM prestamos p
+    JOIN libros l ON p.libroId = l.id
+    JOIN alumnos a ON p.alumnoId = a.id
+  `);
   return rows;
-};
+}
 
-export const createPrestamo = async (libro_id, alumno_id, fecha_prestamo, fecha_devolucion) => {
+export async function createPrestamo(libroId, alumnoId, fechaPrestamo, fechaDevolucion) {
   const [result] = await db.promise().query(
-    "INSERT INTO prestamos (libro_id, alumno_id, fecha_prestamo, fecha_devolucion) VALUES (?, ?, ?, ?)",
-    [libro_id, alumno_id, fecha_prestamo, fecha_devolucion]
+    "INSERT INTO prestamos (libroId, alumnoId, fechaPrestamo, fechaDevolucion) VALUES (?, ?, ?, ?)",
+    [libroId, alumnoId, fechaPrestamo, fechaDevolucion]
   );
   return result.insertId;
-};
+}
 
-export const deletePrestamo = async (id) => {
-  await db.promise().query("DELETE FROM prestamos WHERE id=?", [id]);
-};
+export async function deletePrestamo(id) {
+  await db.promise().query("DELETE FROM prestamos WHERE id = ?", [id]);
+}
