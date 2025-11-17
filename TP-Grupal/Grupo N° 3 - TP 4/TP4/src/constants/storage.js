@@ -1,1 +1,4 @@
-export const STORAGE = { AUTH: "app_auth" };
+
+export const STORAGE = {
+  AUTH: "app_auth_unused"
+};

@@ -1,32 +1,27 @@
-import { ENDPOINTS } from "./endpoints";
 import { httpClient } from "./httpClient";
-import { audit } from "./audit.service";
 
 const client = httpClient();
 
 export const studentsService = {
   async getAll() {
-    return await client.get(ENDPOINTS.students);
+    return await client.get("/api/alumnos");
   },
+
   async create(data) {
-    const res = await client.post(ENDPOINTS.students, data);
-    await audit("CREATE", "students", res.id);
-    return res;
+    return await client.post("/api/alumnos", data);
   },
+
   async update(id, data) {
-    const res = await client.patch(`${ENDPOINTS.students}/${id}`, data);
-    await audit("UPDATE", "students", id);
-    return res;
+    return await client.put(`/api/alumnos/${id}`, data);
   },
+
   async delete(id) {
-    const res = await client.delete(`${ENDPOINTS.students}/${id}`);
-    await audit("DELETE", "students", id);
-    return res;
+    return await client.delete(`/api/alumnos/${id}`);
   },
 };
 
-
-export async function searchStudents(query, limit = 50) {
-  const client = httpClient();
-  return client.get(`${ENDPOINTS.students}?q=${encodeURIComponent(query)}&_limit=${limit}`);
+// búsqueda en el backend real:
+export async function searchStudents(query) {
+    const client = httpClient();
+    return client.get(`/api/alumnos?search=${encodeURIComponent(query)}`);
 }
