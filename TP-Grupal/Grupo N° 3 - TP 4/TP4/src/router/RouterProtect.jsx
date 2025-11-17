@@ -1,20 +1,22 @@
-import { Navigate, useLocation } from "react-router-dom";
-import { getAuth } from "../utils/auth";
+import { Navigate } from "react-router-dom";
+import { useUserStore } from "../store/userStore";
 
-export default function RouterProtect({ children }) {
-  const auth = getAuth();
-  const loc = useLocation();
+export const RouterProtect = ({ children }) => {
+  const usuario = useUserStore((state) => state.usuario);
 
-  if (!auth?.token) {
-    return <Navigate to="/login" replace state={{ from: loc.pathname }} />;
-  }
+  if (!usuario) return <Navigate to="/login" />;
+
   return children;
-}
+};
+import { Navigate } from "react-router-dom";
+import { useUserStore } from "../store/userStore";
 
-export function RequireAdmin({ children }) {
-  const auth = getAuth();
-  if (auth?.role !== "admin") {
-    return <Navigate to="/dashboard" replace />;
+export const RequireAdmin = ({ children }) => {
+  const usuario = useUserStore((state) => state.usuario);
+
+  if (!usuario || usuario.rol !== "admin") {
+    return <Navigate to="/unauthorized" />;
   }
+
   return children;
-}
+};
