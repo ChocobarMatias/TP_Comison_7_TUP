@@ -1,32 +1,41 @@
 import {
-  getAllProductos,
-  getProductoById,
-  createProducto,
-  updateProducto,
-  deleteProducto
-} from "../models/productos.model.js";
+  getAllAlumnos,
+  getAlumnoById,
+  createAlumno,
+  updateAlumno,
+  deleteAlumno,
+} from "../models/alumnos.model.js";
+import { createAuditLog } from "../models/audit.model.js";
 
-export const listProductos = async (req, res) => {
-  try {
-    const rows = await getAllProductos();
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error listando productos" });
-  }
+export const obtenerAlumnos = async (req, res) => {
+  res.json(await getAllAlumnos());
 };
 
-export const getProducto = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const row = await getProductoById(id);
-    if (!row) return res.status(404).json({ error: "Producto no encontrado" });
-    res.json(row);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error al obtener producto" });
-  }
+export const obtenerAlumno = async (req, res) => {
+  const alumno = await getAlumnoById(req.params.id);
+  res.json(alumno);
 };
+
+export const crearAlumno = async (req, res) => {
+  const { nombre, curso, dni } = req.body;
+  const id = await createAlumno(nombre, curso, dni);
+  await createAuditLog("Crear alumno", req.user.nombre);
+  res.json({ mensaje: "Alumno creado", id });
+};
+
+export const editarAlumno = async (req, res) => {
+  const { nombre, curso, dni } = req.body;
+  await updateAlumno(req.params.id, nombre, curso, dni);
+  await createAuditLog("Editar alumno", req.user.nombre);
+  res.json({ mensaje: "Alumno actualizado" });
+};
+
+export const eliminarAlumno = async (req, res) => {
+  await deleteAlumno(req.params.id);
+  await createAuditLog("Eliminar alumno", req.user.nombre);
+  res.json({ mensaje: "Alumno eliminado" });
+};
+
 
 export const createNewProducto = async (req, res) => {
   try {
