@@ -155,21 +155,42 @@ export default function LibrosPage(){
           <tr><th>Título</th><th>Autor</th><th>Cantidad</th><th>Categoria</th><th>Cantidad Disponible</th><th style={{width: 140}}>Acciones</th></tr>
         </thead>
         <tbody>
-          {dataPage.map(l=>(
-            <tr key={l.id}>
-              <td>{l.titulo}</td>
-              <td>{l.autor}</td>
-              <td>{l.cantidad}</td>
-              <td className="text-center">
-                <Button variant="outline-primary" size="sm" onClick={()=>onEdit(l)}><Pencil size={14}/></Button>{" "}
-                <Button variant="outline-danger" size="sm" onClick={()=>onAskDelete(l.id)}><Trash2 size={14}/></Button>
-              </td>
-            </tr>
-          ))}
-          {dataPage.length === 0 && (
-            <tr><td colSpan={4} className="text-center text-muted py-4">Sin resultados en esta página.</td></tr>
-          )}
-        </tbody>
+  {dataPage.map(l => (
+    <tr key={l.id}>
+      <td>{l.titulo}</td>
+      <td>{l.autor}</td>
+      <td>{l.cantidad}</td>
+      <td>{l.categoria}</td>
+      <td>{l.cantidadDisponible}</td>
+
+      <td className="text-center">
+        <Button
+          variant="outline-primary"
+          size="sm"
+          onClick={() => onEdit(l)}
+        >
+          <Pencil size={14} />
+        </Button>{" "}
+        <Button
+          variant="outline-danger"
+          size="sm"
+          onClick={() => onAskDelete(l.id)}
+        >
+          <Trash2 size={14} />
+        </Button>
+      </td>
+    </tr>
+  ))}
+
+  {dataPage.length === 0 && (
+    <tr>
+      <td colSpan={6} className="text-center text-muted py-4">
+        Sin resultados en esta página.
+      </td>
+    </tr>
+  )}
+</tbody>
+
       </Table>
 
       <div className="d-flex justify-content-end mt-2">

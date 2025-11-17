@@ -1,14 +1,15 @@
-import db from "../config/db.js";
+import { pool } from "../config/db.js";
+
 
 export async function createAuditLog(accion, usuario) {
-  await db.promise().query(
+  await pool.promise().query(
     "INSERT INTO auditoria (accion, usuario) VALUES (?, ?)",
     [accion, usuario]
   );
 }
 
 export async function getAuditoria() {
-  const [rows] = await db.promise().query(
+  const [rows] = await pool.promise().query(
     "SELECT * FROM auditoria ORDER BY fecha DESC"
   );
   return rows;

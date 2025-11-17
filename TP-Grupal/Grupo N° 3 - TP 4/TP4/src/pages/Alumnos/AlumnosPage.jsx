@@ -151,22 +151,43 @@ export default function AlumnosPage(){
         <thead>
           <tr><th>Nombre</th><th>Apellido</th><th>DNI</th><th>Email</th><th>Telefono</th><th style={{width: 140}}>Acciones</th></tr>
         </thead>
-        <tbody>
-          {dataPage.map(a=>(
-            <tr key={a.id}>
-              <td>{a.nombre}</td>
-              <td>{a.apellido}</td>
-              <td>{a.dni}</td>
-              <td className="text-center">
-                <Button variant="outline-primary" size="sm" onClick={()=>onEdit(a)}><Pencil size={14}/></Button>{" "}
-                <Button variant="outline-danger" size="sm" onClick={()=>onAskDelete(a.id)}><Trash2 size={14}/></Button>
-              </td>
-            </tr>
-          ))}
-          {dataPage.length === 0 && (
-            <tr><td colSpan={4} className="text-center text-muted py-4">Sin resultados en esta página.</td></tr>
-          )}
-        </tbody>
+       <tbody>
+  {dataPage.map(a => (
+    <tr key={a.id}>
+      <td>{a.nombre}</td>
+      <td>{a.apellido}</td>
+      <td>{a.dni}</td>
+      <td>{a.email}</td>
+      <td>{a.telefono}</td>
+
+      <td className="text-center">
+        <Button
+          variant="outline-primary"
+          size="sm"
+          onClick={() => onEdit(a)}
+        >
+          <Pencil size={14} />
+        </Button>{" "}
+        <Button
+          variant="outline-danger"
+          size="sm"
+          onClick={() => onAskDelete(a.id)}
+        >
+          <Trash2 size={14} />
+        </Button>
+      </td>
+    </tr>
+  ))}
+
+  {dataPage.length === 0 && (
+    <tr>
+      <td colSpan={6} className="text-center text-muted py-4">
+        Sin resultados en esta página.
+      </td>
+    </tr>
+  )}
+</tbody>
+
       </Table>
 
       <div className="d-flex justify-content-end mt-2">

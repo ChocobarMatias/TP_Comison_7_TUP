@@ -1,17 +1,18 @@
-import db from "../config/db.js";
+import { pool } from "../config/db.js";
+
 
 export const getAllEntregas = async () => {
-  const [rows] = await db.query("SELECT * FROM entregas");
+  const [rows] = await pool.query("SELECT * FROM entregas");
   return rows;
 };
 
 export const getEntregaById = async (id) => {
-  const [rows] = await db.query("SELECT * FROM entregas WHERE id = ?", [id]);
+  const [rows] = await pool.query("SELECT * FROM entregas WHERE id = ?", [id]);
   return rows[0];
 };
 
 export const createEntrega = async ({ producto_id, cantidad, fecha, destinatario }) => {
-  const [result] = await db.query(
+  const [result] = await pool.query(
     "INSERT INTO entregas (producto_id, cantidad, fecha, destinatario) VALUES (?, ?, ?, ?)",
     [producto_id, cantidad, fecha, destinatario]
   );
@@ -19,12 +20,12 @@ export const createEntrega = async ({ producto_id, cantidad, fecha, destinatario
 };
 
 export const updateEntrega = async (id, { producto_id, cantidad, fecha, destinatario }) => {
-  await db.query(
+  await pool.query(
     "UPDATE entregas SET producto_id = ?, cantidad = ?, fecha = ?, destinatario = ? WHERE id = ?",
     [producto_id, cantidad, fecha, destinatario, id]
   );
 };
 
 export const deleteEntrega = async (id) => {
-  await db.query("DELETE FROM entregas WHERE id = ?", [id]);
+  await pool.query("DELETE FROM entregas WHERE id = ?", [id]);
 };

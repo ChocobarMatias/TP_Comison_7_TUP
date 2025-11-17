@@ -1,7 +1,8 @@
-import db from "../config/db.js";
+import { pool } from "../config/db.js";
+
 
 export async function getAllPrestamos() {
-  const [rows] = await db.promise().query(`
+  const [rows] = await pool.promise().query(`
     SELECT p.*, 
            l.titulo AS libro, 
            a.nombre AS alumno
@@ -13,7 +14,7 @@ export async function getAllPrestamos() {
 }
 
 export async function createPrestamo(libroId, alumnoId, fechaPrestamo, fechaDevolucion) {
-  const [result] = await db.promise().query(
+  const [result] = await pool.promise().query(
     "INSERT INTO prestamos (libroId, alumnoId, fechaPrestamo, fechaDevolucion) VALUES (?, ?, ?, ?)",
     [libroId, alumnoId, fechaPrestamo, fechaDevolucion]
   );
@@ -21,5 +22,5 @@ export async function createPrestamo(libroId, alumnoId, fechaPrestamo, fechaDevo
 }
 
 export async function deletePrestamo(id) {
-  await db.promise().query("DELETE FROM prestamos WHERE id = ?", [id]);
+  await pool.promise().query("DELETE FROM prestamos WHERE id = ?", [id]);
 }

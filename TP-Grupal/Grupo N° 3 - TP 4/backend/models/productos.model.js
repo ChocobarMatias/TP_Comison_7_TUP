@@ -1,17 +1,18 @@
-import db from "../config/db.js";
+import { pool } from "../config/db.js";
+
 
 export const getAllProductos = async () => {
-  const [rows] = await db.query("SELECT * FROM productos");
+  const [rows] = await pool.query("SELECT * FROM productos");
   return rows;
 };
 
 export const getProductoById = async (id) => {
-  const [rows] = await db.query("SELECT * FROM productos WHERE id = ?", [id]);
+  const [rows] = await pool.query("SELECT * FROM productos WHERE id = ?", [id]);
   return rows[0];
 };
 
 export const createProducto = async ({ nombre, descripcion, precio, cantidad }) => {
-  const [result] = await db.query(
+  const [result] = await pool.query(
     "INSERT INTO productos (nombre, descripcion, precio, cantidad) VALUES (?, ?, ?, ?)",
     [nombre, descripcion, precio, cantidad]
   );
@@ -19,7 +20,7 @@ export const createProducto = async ({ nombre, descripcion, precio, cantidad }) 
 };
 
 export const updateProducto = async (id, { nombre, descripcion, precio, cantidad }) => {
-  await db.query(
+  await pool.query(
     "UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, cantidad = ? WHERE id = ?",
     [nombre, descripcion, precio, cantidad, id]
   );

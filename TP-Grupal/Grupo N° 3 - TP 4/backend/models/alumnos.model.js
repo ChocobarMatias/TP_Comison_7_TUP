@@ -1,30 +1,47 @@
-import db from "../config/db.js";
+import { pool } from "../config/db.js";
 
-export async function getAllAlumnos() {
-  const [rows] = await db.promise().query("SELECT * FROM alumnos");
+
+// Obtener todos los alumnos
+export const getAllAlumnos = async () => {
+  const [rows] = await pool.query(`
+    SELECT 
+      id, nombre, apellido, dni, email, telefono
+    FROM alumnos
+  `);
   return rows;
-}
+};
 
-export async function getAlumnoById(id) {
-  const [rows] = await db.promise().query("SELECT * FROM alumnos WHERE id = ?", [id]);
+// Obtener alumno por ID
+export const getAlumnoById = async (id) => {
+  const [rows] = await pool.query(
+    `SELECT id, nombre, apellido, dni, email, telefono 
+     FROM alumnos WHERE id = ?`,
+    [id]
+  );
   return rows[0];
-}
+};
 
-export async function createAlumno(nombre, apellido, dni, email, telefono) {
-  const [result] = await db.promise().query(
-    "INSERT INTO alumnos (nombre, apellido, dni, email, telefono) VALUES (?, ?, ?, ?, ?)",
+// Crear alumno
+export const createAlumno = async (nombre, apellido, dni, email, telefono) => {
+  const [result] = await pool.query(
+    `INSERT INTO alumnos (nombre, apellido, dni, email, telefono)
+     VALUES (?, ?, ?, ?, ?)`,
     [nombre, apellido, dni, email, telefono]
   );
   return result.insertId;
-}
+};
 
-export async function updateAlumno(id, nombre, apellido, dni, email, telefono) {
-  await db.promise().query(
-    "UPDATE alumnos SET nombre=?, apellido=?, dni=?, email=?, telefono=? WHERE id=?",
+// Editar alumno
+export const updateAlumno = async (id, nombre, apellido, dni, email, telefono) => {
+  await pool.query(
+    `UPDATE alumnos
+     SET nombre = ?, apellido = ?, dni = ?, email = ?, telefono = ?
+     WHERE id = ?`,
     [nombre, apellido, dni, email, telefono, id]
   );
-}
+};
 
-export async function deleteAlumno(id) {
-  await db.promise().query("DELETE FROM alumnos WHERE id = ?", [id]);
-}
+// Eliminar alumno
+export const deleteAlumno = async (id) => {
+  await pool.query(`DELETE FROM alumnos WHERE id = ?`, [id]);
+};
