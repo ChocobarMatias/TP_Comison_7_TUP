@@ -1,10 +1,10 @@
 # 🧾 Auditoría — Semana 3  
-### Grupo Nº: ___  
-### Tema asignado: ___  
+### Grupo Nº: 7  
+### Tema asignado: TP 8 – Sistema de Gestión de Donaciones para ONG 
 ### Integrantes (Nombre completo + Legajo):
-- …
-- …
-- …
+- Lautaro Punta - 61302
+- Facundo DiBerto - 61331
+- Lautaro DiBerto - 61464
 
 ---
 
@@ -23,10 +23,15 @@ Describir brevemente lo encontrado al abrir el proyecto:
 ## 2) SOLUCIONES IMPLEMENTADAS + NUEVO AGREGADO
 
 ### ✅ Soluciones aplicadas a problemas detectados
-- …
+- Correjimos unos errores de mayusculas en llamadas: `Sidebar` -> `SideBar`, `Style.css` -> `Styles.css`
 
 ### ✅ Nuevos requerimientos de Semana 2 agregados
-- …
+- Migración completa a Full Stack: Backend Node.js + Express + MySQL
+- Rutas privadas con `PrivateRoute` (protección con JWT)
+- Custom hooks: `useFetch` y `useService`
+- Servicios HTTP completos (CRUD para donantes, productos, entregas y donaciones)
+- Zustand implementado para manejo de usuario logueado (nombre y rol)
+- Eliminación total de json-server y localStorage
 
 ---
 
