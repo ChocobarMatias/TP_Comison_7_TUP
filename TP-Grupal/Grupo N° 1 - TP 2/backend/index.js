@@ -5,6 +5,7 @@ import usuariosRouter from "./routers/usuarioRouters.js"
 import doctoresRouter from "./routers/doctoresRouters.js"
 import especialidadesRouter from "./routers/especialidadesRoutes.js"
 import pacientesRouters from "./routers/pacientesRouters.js"
+import citasRouters from "./routers/citasRouters.js"
 import "./config/db.js";
 
 
@@ -22,5 +23,6 @@ app.use("/usuarios", usuariosRouter);
 app.use("/doctores", doctoresRouter);
 app.use("/especialidades", especialidadesRouter);
 app.use("/pacientes", pacientesRouters);
+app.use("/citas", citasRouters);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));

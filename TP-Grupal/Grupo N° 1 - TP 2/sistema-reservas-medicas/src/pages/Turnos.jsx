@@ -25,10 +25,8 @@ const Turnos = () => {
     searchAppointments,
     getAppointmentsByStatus,
   } = useAppointments();
-
   const { doctors } = useDoctors();
   const { patients } = usePatients();
-
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
@@ -62,13 +60,13 @@ const Turnos = () => {
     }
   };
 
-  const getDoctorName = (doctorId) => {
-    const doctor = doctors.find((d) => d.id === doctorId);
+  const getDoctorName = (doctor_id) => {
+    const doctor = doctors.find((d) => d.id === doctor_id);
     return doctor ? doctor.nombre : "Desconocido";
   };
 
-  const getPatientName = (patientId) => {
-    const patient = patients.find((p) => p.id === patientId);
+  const getPatientName = (patient_id) => {
+    const patient = patients.find((p) => p.id === patient_id);
     return patient ? `${patient.nombre} ${patient.apellido}` : "Desconocido";
   };
 
@@ -84,11 +82,11 @@ const Turnos = () => {
     );
   };
 
-  const formatDate = (fecha) => {
-    const [year, month, day] = fecha.split("-");
-    return `${day}/${month}/${year}`;
-  };
-
+const formatDate = (fecha) => {
+  const soloFecha = fecha.split("T")[0]; 
+  const [year, month, day] = soloFecha.split("-");
+  return `${day}/${month}/${year}`;
+};
   return (
     <Container className="py-4">
       <Row className="mb-4">
@@ -184,8 +182,8 @@ const Turnos = () => {
                   <tr key={appointment.id}>
                     <td>{formatDate(appointment.fecha)}</td>
                     <td>{appointment.hora}</td>
-                    <td>{getDoctorName(appointment.doctorId)}</td>
-                    <td>{getPatientName(appointment.patientId)}</td>
+                    <td>{getDoctorName(appointment.doctor_id)}</td>
+                    <td>{getPatientName(appointment.paciente_id)}</td>
                     <td>{appointment.motivo}</td>
                     <td>{getStatusBadge(appointment.estado)}</td>
                     <td>

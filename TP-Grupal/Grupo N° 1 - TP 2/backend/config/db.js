@@ -1,11 +1,10 @@
 // Este archivo, es una conexion constante a la BD, es decir que desde aqui, se conectan los
 // controladores
 
-
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config(); // Permite leer varaiables de entorno, (.env)
 
 export const pool = mysql.createPool({
   host: "localhost",

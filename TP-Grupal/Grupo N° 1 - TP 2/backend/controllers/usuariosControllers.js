@@ -75,9 +75,6 @@ export const eliminarUsuario = async (req, res) => {
  export const obtenerUsuarioPorMail = async (req, res) => {
   try {
     const { email, contraseña } = req.body;
-      console.log("Headers:", req.headers);
-  console.log("Body recibido:", req.body);
-    console.log("LLEGA AQUI", email, contraseña);
 
     const [rows] = await pool.query(
       "SELECT * FROM usuarios WHERE email = ?",
