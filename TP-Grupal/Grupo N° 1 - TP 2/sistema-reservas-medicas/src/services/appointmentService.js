@@ -121,7 +121,7 @@ class AppointmentService {
 
   async create(appointmentData) {
     try {
-    const response = await fetch(`http://localhost:3001/citas`, 
+    const response = await fetch(`http://localhost:3001/citas`, //Crear Turno
       {
         method: "POST",
         headers:  {
