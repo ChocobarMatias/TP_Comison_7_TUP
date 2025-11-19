@@ -14,7 +14,7 @@ import {
 import { useAppointments } from "../hooks/useAppointments";
 import { useDoctors } from "../hooks/useDoctors";
 import { usePatients } from "../hooks/usePatients";
-
+import AppointmentFormModal from "../components/TurnoFormModal";
 const Turnos = () => {
   const {
     appointments,
@@ -27,8 +27,12 @@ const Turnos = () => {
   } = useAppointments();
   const { doctors } = useDoctors();
   const { patients } = usePatients();
+  const [showModal, setShowModal] = useState(false);
+  const { createAppointment } = useAppointments(); 
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [citas, setSelectedCita] = useState(null);
 
   useEffect(() => {
     if (filterStatus) {
@@ -40,6 +44,21 @@ const Turnos = () => {
     }
   }, [filterStatus]);
 
+    const handleNewTurno = () => {
+    setSelectedCita(null);
+    setShowModal(true);
+  };
+const handleSaveTurno = async (turnoData) => {
+  const result = await createAppointment(turnoData);
+
+  if (result.success) {
+    alert("Turno creado exitosamente");
+    setShowModal(false);
+  } else {
+    alert(`Error: ${result.error}`);
+  }
+};
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
@@ -48,7 +67,6 @@ const Turnos = () => {
       fetchAppointments();
     }
   };
-
   const handleDelete = async (id) => {
     if (window.confirm("¿Estás seguro de eliminar este turno?")) {
       const result = await deleteAppointment(id);
@@ -139,9 +157,7 @@ const formatDate = (fecha) => {
                 <Button
                   variant="success"
                   className="w-100"
-                  onClick={() =>
-                    alert("Funcionalidad de crear turno próximamente")
-                  }
+                  onClick={handleNewTurno}
                 >
                   Nuevo Turno
                 </Button>
@@ -212,10 +228,13 @@ const formatDate = (fecha) => {
           )}
         </Card.Body>
       </Card>
-
-      <div className="mt-3 text-muted">
-        <small>Total de turnos: {appointments.length}</small>
-      </div>
+          <AppointmentFormModal
+  show={showModal}
+  onHide={() => setShowModal(false)}
+  onSave={handleSaveTurno}
+  doctors={doctors}
+  patients={patients}
+/>
     </Container>
   );
 };

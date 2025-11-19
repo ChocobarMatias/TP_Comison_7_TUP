@@ -120,50 +120,41 @@ class AppointmentService {
   }
 
   async create(appointmentData) {
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    if (
-      !appointmentData.doctorId ||
-      !appointmentData.patientId ||
-      !appointmentData.fecha ||
-      !appointmentData.hora
-    ) {
+    try {
+    const response = await fetch(`http://localhost:3001/citas`, 
+      {
+        method: "POST",
+        headers:  {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          paciente_id: appointmentData.paciente_id,
+          doctor_id: appointmentData.doctor_id,
+          fecha: appointmentData.fecha,
+          hora: appointmentData.hora,
+          motivo: appointmentData.motivo,
+          estado: appointmentData.estado,
+        })
+      })
+          const data = await response.json();
+      if (data.success) {
+        return {
+          success: true,
+          data: data.data,
+          message:  "Turno creado exitosamente",
+        };
+      } else {
+        return {
+          success: false,
+          error:  "Error al crear Turno",
+        };
+      }
+    } catch (error) {
       return {
         success: false,
-        error: "Doctor, paciente, fecha y hora son requeridos",
+        error: error.message || "Error de conexión",
       };
     }
-
-    const conflictingAppointment = this.appointments.find(
-      (a) =>
-        a.doctorId === appointmentData.doctorId &&
-        a.fecha === appointmentData.fecha &&
-        a.hora === appointmentData.hora &&
-        a.estado !== "cancelado"
-    );
-
-    if (conflictingAppointment) {
-      return {
-        success: false,
-        error: "El doctor ya tiene un turno asignado en ese horario",
-      };
-    }
-
-    const newAppointment = {
-      id: Date.now().toString(),
-      estado: "pendiente",
-      observaciones: "",
-      ...appointmentData,
-    };
-
-    this.appointments.push(newAppointment);
-    this.saveAppointmentsToStorage();
-
-    return {
-      success: true,
-      data: newAppointment,
-      message: "Turno creado exitosamente",
-    };
   }
 
   async update(id, appointmentData) {

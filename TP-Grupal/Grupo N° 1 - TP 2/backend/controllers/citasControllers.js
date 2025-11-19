@@ -22,3 +22,18 @@ export const eliminarTurnos = async (req, res) => {
         res.status(500).json({error: "Error Del Servidor"})
     }
 }
+
+export const crearTurnos = async (req, res) => {
+    try{
+    const {paciente_id, doctor_id, fecha, hora, motivo, estado} = req.body
+    if( !paciente_id || !doctor_id || !fecha || !hora || !motivo || !estado ) {
+        return res.status(400).json({ succes: false, error: "Faltan Datos"})
+    }
+    const [rows] = await pool.query ("INSERT INTO citas (paciente_id, doctor_id, fecha, hora, motivo, estado) VALUES (?, ?, ?, ?, ?, ?)",
+        [paciente_id, doctor_id, fecha, hora, motivo, estado]
+    )
+    res.json({success: true, data: {id: rows.insertId, paciente: paciente_id, doctor: doctor_id, fecha: fecha, hora: hora, motivo: motivo, estado: estado}})
+    } catch (error) {
+        res.status(500).json({error: "Error del servidor"})
+    }
+}
