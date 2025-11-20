@@ -158,50 +158,43 @@ class AppointmentService {
   }
 
   async update(id, appointmentData) {
-    await new Promise((resolve) => setTimeout(resolve, 600));
+  try {
+    const response = await fetch(`http://localhost:3001/citas/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        paciente_id: appointmentData.paciente_id,
+        doctor_id: appointmentData.doctor_id,
+        fecha: appointmentData.fecha,
+        hora: appointmentData.hora,
+        motivo: appointmentData.motivo,
+        estado: appointmentData.estado
+      }),
+    });
 
-    const index = this.appointments.findIndex((a) => a.id === id);
+    const data = await response.json();
 
-    if (index === -1) {
+    if (data.success) {
+      return {
+        success: true,
+        data: data.data,
+        message: data.message || "Turno actualizado exitosamente",
+      };
+    } else {
       return {
         success: false,
-        error: "Turno no encontrado",
+        error: data.error || data.message || "Error al actualizar turno",
       };
     }
-
-    if (appointmentData.fecha && appointmentData.hora) {
-      const conflictingAppointment = this.appointments.find(
-        (a) =>
-          a.id !== id &&
-          a.doctorId ===
-            (appointmentData.doctorId || this.appointments[index].doctorId) &&
-          a.fecha === appointmentData.fecha &&
-          a.hora === appointmentData.hora &&
-          a.estado !== "cancelado"
-      );
-
-      if (conflictingAppointment) {
-        return {
-          success: false,
-          error: "El doctor ya tiene un turno asignado en ese horario",
-        };
-      }
-    }
-
-    this.appointments[index] = {
-      ...this.appointments[index],
-      ...appointmentData,
-      id: id,
-    };
-
-    this.saveAppointmentsToStorage();
-
+  } catch (error) {
     return {
-      success: true,
-      data: this.appointments[index],
-      message: "Turno actualizado exitosamente",
+      success: false,
+      error: error.message || "Error de conexión",
     };
   }
+}
 
   async delete(id) {
      try {

@@ -37,3 +37,30 @@ export const crearTurnos = async (req, res) => {
         res.status(500).json({error: "Error del servidor"})
     }
 }
+
+
+export const modificarCita = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { paciente_id, doctor_id, fecha, hora, motivo, estado } = req.body;
+
+        const [result] = await pool.query(
+            "UPDATE citas SET paciente_id = ?, doctor_id = ?, fecha = ?, hora = ?, motivo = ?, estado = ? WHERE id = ?",
+            [paciente_id, doctor_id, fecha, hora, motivo, estado, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Cita no encontrada" });
+        }
+
+        res.json({
+            success: true,
+            data: { id, paciente_id, doctor_id, fecha, hora, motivo, estado },
+            message: "Cita actualizada correctamente",
+        });
+    } catch (error) {
+        console.error("Error al modificar cita:", error);
+        res.status(500).json({ success: false, error: "Error del servidor" });
+    }
+};
+

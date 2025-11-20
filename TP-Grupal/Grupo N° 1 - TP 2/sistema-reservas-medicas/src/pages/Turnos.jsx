@@ -24,6 +24,7 @@ const Turnos = () => {
     deleteAppointment,
     searchAppointments,
     getAppointmentsByStatus,
+    updateAppointment
   } = useAppointments();
   const { doctors } = useDoctors();
   const { patients } = usePatients();
@@ -48,12 +49,28 @@ const Turnos = () => {
     setSelectedCita(null);
     setShowModal(true);
   };
+
+  const handleEditTurno = (appointment) => {
+  setSelectedAppointment(appointment); 
+  setShowModal(true);
+};
+  
 const handleSaveTurno = async (turnoData) => {
-  const result = await createAppointment(turnoData);
+
+  let result;
+
+  if (selectedAppointment) {
+    // Si ya había turno seleccionado → UPDATE
+    result = await updateAppointment(selectedAppointment.id, turnoData);
+  } else {
+    // Si no hay turno seleccionado → CREATE
+    result = await createAppointment(turnoData);
+  }
 
   if (result.success) {
-    alert("Turno creado exitosamente");
+    alert(result.message || "Turno guardado correctamente");
     setShowModal(false);
+    setSelectedAppointment(null);
   } else {
     alert(`Error: ${result.error}`);
   }
@@ -203,16 +220,14 @@ const formatDate = (fecha) => {
                     <td>{appointment.motivo}</td>
                     <td>{getStatusBadge(appointment.estado)}</td>
                     <td>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        className="me-2"
-                        onClick={() =>
-                          alert("Funcionalidad de editar próximamente")
-                        }
-                      >
-                        Editar
-                      </Button>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => handleEditTurno(appointment)}
+                        >
+                          Editar
+                        </Button>
                       <Button
                         variant="outline-danger"
                         size="sm"
@@ -230,10 +245,14 @@ const formatDate = (fecha) => {
       </Card>
           <AppointmentFormModal
   show={showModal}
-  onHide={() => setShowModal(false)}
+  onHide={() => {
+    setShowModal(false);
+    setSelectedAppointment(null);
+  }}
   onSave={handleSaveTurno}
   doctors={doctors}
   patients={patients}
+  appointment={selectedAppointment}
 />
     </Container>
   );
