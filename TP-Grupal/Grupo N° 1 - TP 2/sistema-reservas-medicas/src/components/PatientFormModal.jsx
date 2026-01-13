@@ -35,7 +35,7 @@ const PatientFormModal = ({ show, onHide, onSave, patient }) => {
   }, [patient, show]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target; // name es el nombre del campo del formulario que queres cambiar en el use state y value es el valor que tendra.
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -75,7 +75,7 @@ const PatientFormModal = ({ show, onHide, onSave, patient }) => {
 
     if (!formData.email.trim()) {
       newErrors.email = "El email es requerido";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) { //Condicion que debe tener el formdata, aqui dice que si no tiene @ algo escritoy puntos, dara error
       newErrors.email = "El email no es válido";
     }
 

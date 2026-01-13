@@ -67,7 +67,7 @@ class PatientService {
 
   async getAll() {
     try {
-      const response = await fetch("http://localhost:3001/pacientes");
+      const response = await fetch("http://localhost:3001/pacientes"); //Por defecto es un get, por que no hay ningun metodo especificado
     const data = await response.json();
       if (data.success) {
         return {
@@ -115,7 +115,7 @@ class PatientService {
   async create(patientData) {
     try {
       
-      const response = await fetch(`http://localhost:3001/pacientes`,
+      const response = await fetch(`http://localhost:3001/pacientes`, //Se utiliza el metodo Post
       {
         method: "POST", // o "PUT" si tu backend lo espera así
         headers: {
@@ -132,7 +132,6 @@ class PatientService {
         }),
       });
     const data = await response.json();
-console.log(data)
       if (data.success) {
         return {
           success: true,
@@ -202,7 +201,6 @@ console.log(data)
       },
     });
     const data = await response.json();
-console.log(data)
       if (data.success) {
         return {
           success: true,

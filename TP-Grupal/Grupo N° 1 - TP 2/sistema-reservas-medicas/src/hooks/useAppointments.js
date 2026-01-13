@@ -12,8 +12,7 @@ export const useAppointments = () => {
 
     try {
       const result = await appointmentService.getAll();
-
-      if (result.success) {
+      if (result.succes) {
         setAppointments(result.data);
       } else {
         setError(result.error);

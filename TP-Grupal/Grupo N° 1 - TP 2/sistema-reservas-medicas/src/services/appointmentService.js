@@ -83,36 +83,22 @@ const MOCK_APPOINTMENTS = [
 
 class AppointmentService {
   constructor() {
-    this.loadAppointmentsFromStorage();
+    this.citas = this.getAll();
   }
-
-  loadAppointmentsFromStorage() {
-    const stored = localStorage.getItem("appointments");
-    if (stored) {
-      try {
-        this.appointments = JSON.parse(stored);
-      } catch {
-        this.appointments = [...MOCK_APPOINTMENTS];
-        this.saveAppointmentsToStorage();
-      }
-    } else {
-      this.appointments = [...MOCK_APPOINTMENTS];
-      this.saveAppointmentsToStorage();
-    }
-  }
-
-  saveAppointmentsToStorage() {
-    localStorage.setItem("appointments", JSON.stringify(this.appointments));
-  }
-
   async getAll() {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  try {
+    const response = await fetch("http://localhost:3001/citas");
+    const data = await response.json();
 
+    console.log("Citas:", data);
+    return data;
+  } catch (error) {
+    console.error("Error al obtener citas:", error);
     return {
-      success: true,
-      data: this.appointments,
-      total: this.appointments.length,
+      success: false,
+      error: "Error al obtener citas",
     };
+  }
   }
 
   async getById(id) {
@@ -134,119 +120,109 @@ class AppointmentService {
   }
 
   async create(appointmentData) {
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    if (
-      !appointmentData.doctorId ||
-      !appointmentData.patientId ||
-      !appointmentData.fecha ||
-      !appointmentData.hora
-    ) {
+    try {
+    const response = await fetch(`http://localhost:3001/citas`, //Crear Turno
+      {
+        method: "POST",
+        headers:  {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          paciente_id: appointmentData.paciente_id,
+          doctor_id: appointmentData.doctor_id,
+          fecha: appointmentData.fecha,
+          hora: appointmentData.hora,
+          motivo: appointmentData.motivo,
+          estado: appointmentData.estado,
+        })
+      })
+          const data = await response.json();
+      if (data.success) {
+        return {
+          success: true,
+          data: data.data,
+          message:  "Turno creado exitosamente",
+        };
+      } else {
+        return {
+          success: false,
+          error:  "Error al crear Turno",
+        };
+      }
+    } catch (error) {
       return {
         success: false,
-        error: "Doctor, paciente, fecha y hora son requeridos",
+        error: error.message || "Error de conexión",
       };
     }
-
-    const conflictingAppointment = this.appointments.find(
-      (a) =>
-        a.doctorId === appointmentData.doctorId &&
-        a.fecha === appointmentData.fecha &&
-        a.hora === appointmentData.hora &&
-        a.estado !== "cancelado"
-    );
-
-    if (conflictingAppointment) {
-      return {
-        success: false,
-        error: "El doctor ya tiene un turno asignado en ese horario",
-      };
-    }
-
-    const newAppointment = {
-      id: Date.now().toString(),
-      estado: "pendiente",
-      observaciones: "",
-      ...appointmentData,
-    };
-
-    this.appointments.push(newAppointment);
-    this.saveAppointmentsToStorage();
-
-    return {
-      success: true,
-      data: newAppointment,
-      message: "Turno creado exitosamente",
-    };
   }
 
   async update(id, appointmentData) {
-    await new Promise((resolve) => setTimeout(resolve, 600));
+  try {
+    const response = await fetch(`http://localhost:3001/citas/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        paciente_id: appointmentData.paciente_id,
+        doctor_id: appointmentData.doctor_id,
+        fecha: appointmentData.fecha,
+        hora: appointmentData.hora,
+        motivo: appointmentData.motivo,
+        estado: appointmentData.estado
+      }),
+    });
 
-    const index = this.appointments.findIndex((a) => a.id === id);
+    const data = await response.json();
 
-    if (index === -1) {
+    if (data.success) {
+      return {
+        success: true,
+        data: data.data,
+        message: data.message || "Turno actualizado exitosamente",
+      };
+    } else {
       return {
         success: false,
-        error: "Turno no encontrado",
+        error: data.error || data.message || "Error al actualizar turno",
       };
     }
-
-    if (appointmentData.fecha && appointmentData.hora) {
-      const conflictingAppointment = this.appointments.find(
-        (a) =>
-          a.id !== id &&
-          a.doctorId ===
-            (appointmentData.doctorId || this.appointments[index].doctorId) &&
-          a.fecha === appointmentData.fecha &&
-          a.hora === appointmentData.hora &&
-          a.estado !== "cancelado"
-      );
-
-      if (conflictingAppointment) {
-        return {
-          success: false,
-          error: "El doctor ya tiene un turno asignado en ese horario",
-        };
-      }
-    }
-
-    this.appointments[index] = {
-      ...this.appointments[index],
-      ...appointmentData,
-      id: id,
-    };
-
-    this.saveAppointmentsToStorage();
-
+  } catch (error) {
     return {
-      success: true,
-      data: this.appointments[index],
-      message: "Turno actualizado exitosamente",
+      success: false,
+      error: error.message || "Error de conexión",
     };
   }
+}
 
   async delete(id) {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-
-    const index = this.appointments.findIndex((a) => a.id === id);
-
-    if (index === -1) {
+     try {
+      const response = await fetch(`http://localhost:3001/citas/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+      if (data.success) {
+        return {
+          success: true,
+          data: data.data,
+          message: "Cita eliminada exitosamente",
+        };
+      } else {
+        return {
+          success: false,
+          error: "Error al eliminar cita",
+        };
+      }
+    } catch (error) {
       return {
         success: false,
-        error: "Turno no encontrado",
+        error: error.message || "Error de conexión",
       };
     }
-
-    const deletedAppointment = this.appointments[index];
-    this.appointments.splice(index, 1);
-    this.saveAppointmentsToStorage();
-
-    return {
-      success: true,
-      data: deletedAppointment,
-      message: "Turno eliminado exitosamente",
-    };
   }
 
   async search(query) {

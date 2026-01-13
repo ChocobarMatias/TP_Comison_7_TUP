@@ -85,8 +85,6 @@ export const eliminarPaciente = async (req, res) => {
  export const obtenerPacientePorMail = async (req, res) => {
   try {
     const { email } = req.body;
-      console.log("Headers:", req.headers);
-  console.log("Body recibido:", req.body);
 
     const [rows] = await pool.query(
       "SELECT * FROM pacientes WHERE email = ?",

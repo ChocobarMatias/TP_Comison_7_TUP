@@ -14,7 +14,7 @@ import {
 import { useAppointments } from "../hooks/useAppointments";
 import { useDoctors } from "../hooks/useDoctors";
 import { usePatients } from "../hooks/usePatients";
-
+import AppointmentFormModal from "../components/TurnoFormModal";
 const Turnos = () => {
   const {
     appointments,
@@ -24,13 +24,16 @@ const Turnos = () => {
     deleteAppointment,
     searchAppointments,
     getAppointmentsByStatus,
+    updateAppointment
   } = useAppointments();
-
   const { doctors } = useDoctors();
   const { patients } = usePatients();
-
+  const [showModal, setShowModal] = useState(false);
+  const { createAppointment } = useAppointments(); 
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [citas, setSelectedCita] = useState(null);
 
   useEffect(() => {
     if (filterStatus) {
@@ -42,6 +45,37 @@ const Turnos = () => {
     }
   }, [filterStatus]);
 
+    const handleNewTurno = () => {
+    setSelectedCita(null);
+    setShowModal(true);
+  };
+
+  const handleEditTurno = (appointment) => {
+  setSelectedAppointment(appointment); 
+  setShowModal(true);
+};
+  
+const handleSaveTurno = async (turnoData) => {
+
+  let result;
+
+  if (selectedAppointment) {
+    // Si ya había turno seleccionado → UPDATE
+    result = await updateAppointment(selectedAppointment.id, turnoData);
+  } else {
+    // Si no hay turno seleccionado → CREATE
+    result = await createAppointment(turnoData);
+  }
+
+  if (result.success) {
+    alert(result.message || "Turno guardado correctamente");
+    setShowModal(false);
+    setSelectedAppointment(null);
+  } else {
+    alert(`Error: ${result.error}`);
+  }
+};
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
@@ -50,7 +84,6 @@ const Turnos = () => {
       fetchAppointments();
     }
   };
-
   const handleDelete = async (id) => {
     if (window.confirm("¿Estás seguro de eliminar este turno?")) {
       const result = await deleteAppointment(id);
@@ -62,13 +95,13 @@ const Turnos = () => {
     }
   };
 
-  const getDoctorName = (doctorId) => {
-    const doctor = doctors.find((d) => d.id === doctorId);
+  const getDoctorName = (doctor_id) => {
+    const doctor = doctors.find((d) => d.id === doctor_id);
     return doctor ? doctor.nombre : "Desconocido";
   };
 
-  const getPatientName = (patientId) => {
-    const patient = patients.find((p) => p.id === patientId);
+  const getPatientName = (patient_id) => {
+    const patient = patients.find((p) => p.id === patient_id);
     return patient ? `${patient.nombre} ${patient.apellido}` : "Desconocido";
   };
 
@@ -84,11 +117,11 @@ const Turnos = () => {
     );
   };
 
-  const formatDate = (fecha) => {
-    const [year, month, day] = fecha.split("-");
-    return `${day}/${month}/${year}`;
-  };
-
+const formatDate = (fecha) => {
+  const soloFecha = fecha.split("T")[0]; 
+  const [year, month, day] = soloFecha.split("-");
+  return `${day}/${month}/${year}`;
+};
   return (
     <Container className="py-4">
       <Row className="mb-4">
@@ -141,9 +174,7 @@ const Turnos = () => {
                 <Button
                   variant="success"
                   className="w-100"
-                  onClick={() =>
-                    alert("Funcionalidad de crear turno próximamente")
-                  }
+                  onClick={handleNewTurno}
                 >
                   Nuevo Turno
                 </Button>
@@ -184,21 +215,19 @@ const Turnos = () => {
                   <tr key={appointment.id}>
                     <td>{formatDate(appointment.fecha)}</td>
                     <td>{appointment.hora}</td>
-                    <td>{getDoctorName(appointment.doctorId)}</td>
-                    <td>{getPatientName(appointment.patientId)}</td>
+                    <td>{getDoctorName(appointment.doctor_id)}</td>
+                    <td>{getPatientName(appointment.paciente_id)}</td>
                     <td>{appointment.motivo}</td>
                     <td>{getStatusBadge(appointment.estado)}</td>
                     <td>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        className="me-2"
-                        onClick={() =>
-                          alert("Funcionalidad de editar próximamente")
-                        }
-                      >
-                        Editar
-                      </Button>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => handleEditTurno(appointment)}
+                        >
+                          Editar
+                        </Button>
                       <Button
                         variant="outline-danger"
                         size="sm"
@@ -214,10 +243,17 @@ const Turnos = () => {
           )}
         </Card.Body>
       </Card>
-
-      <div className="mt-3 text-muted">
-        <small>Total de turnos: {appointments.length}</small>
-      </div>
+          <AppointmentFormModal
+  show={showModal}
+  onHide={() => {
+    setShowModal(false);
+    setSelectedAppointment(null);
+  }}
+  onSave={handleSaveTurno}
+  doctors={doctors}
+  patients={patients}
+  appointment={selectedAppointment}
+/>
     </Container>
   );
 };

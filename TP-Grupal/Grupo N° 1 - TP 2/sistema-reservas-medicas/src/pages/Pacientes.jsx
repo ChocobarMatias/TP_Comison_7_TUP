@@ -29,7 +29,6 @@ const Pacientes = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
